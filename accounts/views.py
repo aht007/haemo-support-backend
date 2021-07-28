@@ -50,6 +50,12 @@ class UsersList(generics.RetrieveAPIView):
     
     def get(self, request, *args, **kwargs):
         # get all users
-        queryset = User.objects.all().order_by('-date_joined')
-        serializer = UserSerializer(queryset, many=True)
-        return Response(serializer.data)
+        user = self.request.user
+        if user.is_superuser:
+            queryset = User.objects.all().order_by('-date_joined')
+            serializer = UserSerializer(queryset, many=True)
+            return Response(serializer.data)
+        else:
+            user = User.objects.filter(username=user.username)
+            serializer = UserSerializer(user, many=True)
+            return Response(serializer.data)
