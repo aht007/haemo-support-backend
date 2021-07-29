@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from .models import my_user
 from django.contrib.auth import authenticate
 
 # USER Serilaizer....
@@ -7,21 +7,21 @@ from django.contrib.auth import authenticate
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ('id', 'username', 'email')
+        model = my_user
+        fields = ('id', 'username', 'email', 'date_of_birth', 'phone_number', 'blood_group')
 
 # Register
 
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ('id', 'username', 'email', 'password')
+        model = my_user
+        fields = ('id', 'username', 'email', 'date_of_birth', 'phone_number', 'blood_group')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        user = User.objects.create_user(
-            validated_data['username'], validated_data['email'], validated_data['password'])
+        user = my_user.objects.create_user(
+            validated_data['username'], validated_data['email'], validated_data['password'], validated_data['date_of_birth'], validated_data['phone_number'], validated_data['blood_group'])
         # validated data is included by django itself
         return user
 # Login
