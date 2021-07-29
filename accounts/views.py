@@ -1,6 +1,6 @@
+from accounts.models import my_user
 from rest_framework import generics, permissions
 from rest_framework.response import Response
-from django.contrib.auth.models import User
 from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
 from rest_framework.decorators import authentication_classes, permission_classes
 
@@ -61,10 +61,10 @@ class UsersList(generics.RetrieveAPIView):
         # get all users
         user = self.request.user
         if user.is_superuser:
-            queryset = User.objects.all().order_by('-date_joined')
+            queryset = my_user.objects.all().order_by('-date_joined')
             serializer = UserSerializer(queryset, many=True)
             return Response(serializer.data)
         else:
-            user = User.objects.filter(username=user.username)
+            user = my_user.objects.filter(username=user.username)
             serializer = UserSerializer(user, many=True)
             return Response(serializer.data)
