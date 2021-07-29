@@ -2,10 +2,13 @@ from rest_framework import generics, permissions
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
+from rest_framework.decorators import authentication_classes, permission_classes
 
 # Regsiter Api
 
 
+@authentication_classes([])
+@permission_classes([])
 class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
 
@@ -19,6 +22,8 @@ class RegisterAPI(generics.GenericAPIView):
 # Login API
 
 
+@authentication_classes([])
+@permission_classes([])
 class LoginAPI(generics.GenericAPIView):
     serializer_class = LoginSerializer
 
@@ -34,6 +39,8 @@ class LoginAPI(generics.GenericAPIView):
 # Get User API
 
 # return logged in user
+
+
 class UserAPI(generics.RetrieveAPIView):
     # permission_classes = [
     #     permissions.IsAuthenticated,
@@ -44,10 +51,12 @@ class UserAPI(generics.RetrieveAPIView):
         return self.request.user
 
 # get all users
+
+
 class UsersList(generics.RetrieveAPIView):
 
     serializer_class = UserSerializer
-    
+
     def get(self, request, *args, **kwargs):
         # get all users
         user = self.request.user
