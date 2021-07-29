@@ -23,8 +23,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
+        blood_group = validated_data.get('blood_group', None)
+
         user = my_user.objects.create_user(
-            validated_data['username'], validated_data['email'], validated_data['date_of_birth'],validated_data['phone_number'],validated_data['blood_group'], validated_data['password'])
+            validated_data['username'], validated_data['email'], validated_data['date_of_birth'],validated_data['phone_number'],blood_group, validated_data['password'])
         # validated data is included by django itself
         return user
 # Login

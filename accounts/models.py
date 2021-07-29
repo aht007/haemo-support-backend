@@ -16,7 +16,7 @@ class BloodGroupTypes(models.TextChoices):
 
 
 class MyUserManager(BaseUserManager):
-    def create_user(self, username, email, date_of_birth, phone_number, blood_group, password=None):
+    def create_user(self, username, email, date_of_birth, phone_number, blood_group=None, password=None):
         """
         Creates and saves a User with the given email, date of
         birth and password.
@@ -25,9 +25,7 @@ class MyUserManager(BaseUserManager):
             raise ValueError('Users must have an email address')
         if not phone_number:
             raise ValueError('Phone Number not provided')
-        if not blood_group:
-            raise ValueError('Blood Group Not Provided')
-        
+
         user = self.model(
             email=self.normalize_email(email),
             date_of_birth=date_of_birth,
@@ -39,7 +37,7 @@ class MyUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, email, date_of_birth, phone_number, blood_group, password=None):
+    def create_superuser(self, username, email, date_of_birth, phone_number, blood_group=None, password=None):
         """
         Creates and saves a superuser with the given email, date of
         birth and password.
@@ -64,8 +62,8 @@ class my_user(AbstractUser):
     date_of_birth = models.DateField()
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-    phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True) # validators should be a list
-    blood_group = models.CharField(max_length=3, choices=BloodGroupTypes.choices, default=BloodGroupTypes.OPositive)
+    phone_number = models.CharField(validators=[phone_regex], max_length=17) # validators should be a list
+    blood_group = models.CharField(max_length=3, choices=BloodGroupTypes.choices, null=True)
 
     objects = MyUserManager()
 
