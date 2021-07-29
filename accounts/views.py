@@ -1,8 +1,12 @@
 from accounts.models import my_user
 from rest_framework import generics, permissions
 from rest_framework.response import Response
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
+from .serializers import MyTokenObtainPairSerializer, UserSerializer, RegisterSerializer, LoginSerializer
 from rest_framework.decorators import authentication_classes, permission_classes
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 # Regsiter Api
 
@@ -68,3 +72,7 @@ class UsersList(generics.RetrieveAPIView):
             user = my_user.objects.filter(username=user.username)
             serializer = UserSerializer(user, many=True)
             return Response(serializer.data)
+
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer

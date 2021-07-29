@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from .models import my_user
 from django.contrib.auth import authenticate
-
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+import datetime
 # USER Serilaizer....
 
 
@@ -40,3 +41,15 @@ class LoginSerializer(serializers.Serializer):
         if user and user.is_active:
             return user
         raise serializers.ValidationError("Incorrect Credentials")
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Add custom claims
+        token['iat'] = token.current_time
+        token['user'] = user.username
+        token['date'] = str(datetime.date.today())
+
+        return token
