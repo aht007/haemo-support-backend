@@ -33,9 +33,9 @@ class MyUserManager(BaseUserManager):
             date_of_birth=date_of_birth,
             phone_number=phone_number,
             blood_group=blood_group,
-            username=username,
-            password=password
         )
+        user.username = username
+        user.set_password(password)
         user.save(using=self._db)
         return user
 
