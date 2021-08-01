@@ -4,21 +4,19 @@ from .models import HealthProfile, Illness
 from django.contrib.auth import authenticate
 
 class HealthProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-    
+
     class Meta:
         model = HealthProfile
-        fields = "__all__"
+        fields = ['times_donated']
 
     def create(self, validated_data):
         healthProfile = HealthProfile.objects.create(
             **validated_data,
-            user_id = self.context['request'].user.id
+            user_id = self.context['request'].user
         )
         return healthProfile
 
 class IllnessSerializer(serializers.ModelSerializer):
-    healthProfile = HealthProfileSerializer(read_only=True)
 
     class Meta:
         model = Illness

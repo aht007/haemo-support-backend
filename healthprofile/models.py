@@ -7,7 +7,7 @@ class HealthProfile(models.Model):
     times_donated = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.user_id
+        return self.user_id.username
 
 class Illness(models.Model):
     medical_profile_id = models.ForeignKey(
