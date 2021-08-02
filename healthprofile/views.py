@@ -12,10 +12,11 @@ class GetHealthProfile(APIView):
         context = {'request': request} 
         profile = user.health_profile or {}
         illness = profile.illness.all() or []
-        return Response({
-            'profile': HealthProfileSerializer(profile, context=context).data,
-            'illnesses': IllnessSerializer(illness, context=context, many=True).data
-        })
+        profile = HealthProfileSerializer(profile, context=context).data
+        profile['illnesses'] = IllnessSerializer(illness, context=context, many=True).data
+        return Response(
+            profile
+        )
 
 class CreateHealthProfile(APIView):
 
@@ -24,9 +25,12 @@ class CreateHealthProfile(APIView):
         serializer = HealthProfileSerializer(data=request.data, context=context)
         if serializer.is_valid():
             profile = serializer.save()
-            return Response({
-                "healthProfile": HealthProfileSerializer(profile, context=context).data
-            })
+            illness = profile.illness.all() or []
+            profile = HealthProfileSerializer(profile, context=context).data
+            profile['illnesses'] = IllnessSerializer(illness, context=context, many=True).data
+            return Response(
+                profile
+            )
         return Response(
             code=400, data='Wrong Parameters'
         )        
@@ -39,22 +43,69 @@ class EditHealthProfile(APIView):
         object = self.get_object(pk)
         serializer = HealthProfileSerializer(object, data=request.data, partial=True)
         if serializer.is_valid():
-            data = serializer.save()
-            return Response({
-                "healthProfile": HealthProfileSerializer(data, context= request).data
-            })
+            profile = serializer.save()
+            illness = profile.illness.all() or []
+            profile = HealthProfileSerializer(profile, context=request).data
+            profile['illnesses'] = IllnessSerializer(illness, context=request, many=True).data
+            return Response(
+                profile
+            )
         return Response(
             code=400, data='Wrong Parameters'
         )
 
 class AddIllnes(APIView):
-    pass
+    def post(self, request, *args, **kwargs):
+        context = {'request': request} 
+        serializer = IllnessSerializer(data=request.data, context=context)
+        if serializer.is_valid():
+            data = serializer.save()
+            profile = HealthProfile.objects.get(pk=data.medical_profile_id.id)
+            illness = profile.illness.all() or []
+            profile = HealthProfileSerializer(profile, context=request).data
+            profile['illnesses'] = IllnessSerializer(illness, context=request, many=True).data
+            return Response(
+                profile
+            )
+        return Response(
+            code=400, data='Wrong Parameters'
+        )        
 
 class EditIllness(APIView):
-    pass
+    def get_object(self, pk):
+        return Illness.objects.get(pk=pk)
+
+    def patch(self, request, pk):
+        object = self.get_object(pk)
+        serializer = IllnessSerializer(object, data = request.data, partial=True)
+        if serializer.is_valid():
+            data = serializer.save()
+            profile = HealthProfile.objects.get(pk=data.medical_profile_id.id)
+            illness = profile.illness.all() or []
+            profile = HealthProfileSerializer(profile, context=request).data
+            profile['illnesses'] = IllnessSerializer(illness, context=request, many=True).data
+            return Response(
+                profile
+            )
+
+        return Response(
+            code=400, data='Wrong Parameters'
+        )
 
 class RemoveIllness(APIView):
-    pass
+    def delete(self, request, pk):
+        obj = Illness.objects.get(pk=pk)
+        profile = HealthProfile.objects.get(pk=obj.medical_profile_id.id)
+        obj.delete()
+        illness = profile.illness.all() or []
+        profile = HealthProfileSerializer(profile, context=request).data
+        profile['illnesses'] = IllnessSerializer(illness, context=request, many=True).data
+        return Response(
+            profile
+        )
+
+
+
 
 # class GetAllIllness(APIView):
 #     pass

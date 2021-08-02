@@ -7,7 +7,7 @@ class HealthProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = HealthProfile
-        fields = ['times_donated']
+        fields = ['id', 'times_donated']
 
     def create(self, validated_data):
         healthProfile = HealthProfile.objects.create(
