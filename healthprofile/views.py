@@ -87,7 +87,7 @@ class AddIllnes(APIView):
                 profile
             )
         return Response(
-            code=400, data='Wrong Parameters'
+            data='Wrong Parameters'
         )
 
 
