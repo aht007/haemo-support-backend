@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework import authentication, permissions
 
 
-class GetHealthProfile(APIView):
-    # to modify later
+class HealthProfileView(APIView):
+    # to get Logged in User's Health profile
     def get(self, request, format=None):
         user = request.user
         context = {'request': request}
@@ -29,9 +29,7 @@ class GetHealthProfile(APIView):
             profile
         )
 
-
-class CreateHealthProfile(APIView):
-
+    # create a new health profile
     def post(self, request, *args, **kwargs):
         context = {'request': request}
         serializer = HealthProfileSerializer(
@@ -48,12 +46,12 @@ class CreateHealthProfile(APIView):
         return Response(
             code=400, data='Wrong Parameters'
         )
+    # get health profile object for a specific pk
 
-
-class EditHealthProfile(APIView):
     def get_object(self, pk):
         return HealthProfile.objects.get(user_id=pk)
 
+    # edit health profile
     def patch(self, request, pk):
         object = self.get_object(pk)
         serializer = HealthProfileSerializer(
@@ -72,7 +70,8 @@ class EditHealthProfile(APIView):
         )
 
 
-class AddIllnes(APIView):
+class IllnessView(APIView):
+    # add a new illness
     def post(self, request, *args, **kwargs):
         context = {'request': request}
         serializer = IllnessSerializer(data=request.data, context=context)
@@ -89,12 +88,12 @@ class AddIllnes(APIView):
         return Response(
             data='Wrong Parameters'
         )
-
-
-class EditIllness(APIView):
+    
+    # get illness for a specific primary key
     def get_object(self, pk):
         return Illness.objects.get(pk=pk)
 
+    # edit an illness object
     def patch(self, request, pk):
         object = self.get_object(pk)
         serializer = IllnessSerializer(object, data=request.data, partial=True)
@@ -112,9 +111,7 @@ class EditIllness(APIView):
         return Response(
             code=400, data='Wrong Parameters'
         )
-
-
-class RemoveIllness(APIView):
+    # delete an illness using primary key
     def delete(self, request, pk):
         obj = Illness.objects.get(pk=pk)
         profile = HealthProfile.objects.get(pk=obj.medical_profile_id.id)
@@ -126,7 +123,3 @@ class RemoveIllness(APIView):
         return Response(
             profile
         )
-
-
-# class GetAllIllness(APIView):
-#     pass
