@@ -32,9 +32,9 @@ class UserRegisterViews(generics.GenericAPIView):
 
     
 
+
 class UserLoginViews(generics.GenericAPIView):
     
-    # User Login 
     @authentication_classes([])
     @permission_classes([])
     def post(self, request, *args, **kwargs):
@@ -45,11 +45,7 @@ class UserLoginViews(generics.GenericAPIView):
             "user": UserSerializer(user, context=self.get_serializer_context()).data
         })
 
-    # get logged in user
-    def get_object(self):
-        return self.request.user
-    
-    # get all users if user is admin else return self
+
     def get(self, request, *args, **kwargs):
         # get all users
         user = self.request.user
@@ -61,6 +57,14 @@ class UserLoginViews(generics.GenericAPIView):
             user = my_user.objects.filter(username=user.username)
             serializer = UserSerializer(user, many=True)
             return Response(serializer.data)
+
+
+class UserAPI(generics.RetrieveAPIView):
+
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        return self.request.user
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
