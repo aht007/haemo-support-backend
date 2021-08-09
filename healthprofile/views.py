@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework import authentication, permissions
 
 
-class HealthProfileViews(APIView):
+class HealthProfileView(APIView):
     # to get Logged in User's Health profile
     def get(self, request, format=None):
         user = request.user
@@ -70,7 +70,7 @@ class HealthProfileViews(APIView):
         )
 
 
-class IllnessViews(APIView):
+class IllnessView(APIView):
     # add a new illness
     def post(self, request, *args, **kwargs):
         context = {'request': request}

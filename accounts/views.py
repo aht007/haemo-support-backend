@@ -8,7 +8,7 @@ from rest_framework_simplejwt.views import (
 )
 
 
-class UserRegisterViews(generics.GenericAPIView):
+class UserRegisterView(generics.GenericAPIView):
     # Add a user 
     @authentication_classes([])
     @permission_classes([])
@@ -33,7 +33,7 @@ class UserRegisterViews(generics.GenericAPIView):
     
 
 
-class UserLoginViews(generics.GenericAPIView):
+class UserLoginView(generics.GenericAPIView):
     
     @authentication_classes([])
     @permission_classes([])
