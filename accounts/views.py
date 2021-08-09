@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from accounts.models import my_user
 from rest_framework import generics, permissions
 from rest_framework.response import Response
@@ -24,6 +25,18 @@ class RegisterAPI(generics.GenericAPIView):
             "user": UserSerializer(user, context=self.get_serializer_context()).data
         })
 # Login API
+
+class EditUser(generics.GenericAPIView):
+    serializer_class = RegisterSerializer
+
+    def patch(self, request):
+        user = self.request.user
+        serializer = self.get_serializer(user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response({
+            "user": UserSerializer(user, context=self.get_serializer_context()).data
+        })
 
 
 @authentication_classes([])
