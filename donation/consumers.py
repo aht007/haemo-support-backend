@@ -30,7 +30,7 @@ class DonationRequestsConsumer(WebsocketConsumer):
         """
         
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
+        request = text_data_json['request']
         utc_time = datetime.datetime.now(datetime.timezone.utc)
         utc_time = utc_time.isoformat()
 
@@ -38,7 +38,7 @@ class DonationRequestsConsumer(WebsocketConsumer):
             self.room_group_name,
             {
                 'type': 'donation_request',
-                'message': message,
+                'request': request,
                 'utc_time': utc_time,
             }
         )
@@ -48,11 +48,11 @@ class DonationRequestsConsumer(WebsocketConsumer):
         Receive a broadcast message and send it over a websocket
         """
         
-        message = event['message']
+        request = event['request']
         utc_time = event['utc_time']
 
         # Send message to WebSocket
         self.send(text_data=json.dumps({
-            'message': message,
+            'request': request,
             'utc_time': utc_time,
         }))
