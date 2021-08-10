@@ -1,3 +1,4 @@
+from donation.models import DonationRequest
 import json
 import datetime
 from asgiref.sync import async_to_sync
@@ -23,23 +24,24 @@ class DonationRequestsConsumer(WebsocketConsumer):
             self.channel_name
         )
 
+    def myDateConvertor(self, d):
+        if isinstance(d, datetime.datetime):
+            return d.__str__()
 
     def receive(self, text_data):
         """
         Receive a message and broadcast it to a room group
         """
-        
+
         text_data_json = json.loads(text_data)
         request = text_data_json['request']
-        utc_time = datetime.datetime.now(datetime.timezone.utc)
-        utc_time = utc_time.isoformat()
+        donationReq = DonationRequest.objects.create(**request)
 
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
                 'type': 'donation_request',
-                'request': request,
-                'utc_time': utc_time,
+                'request': json.dumps(donationReq.as_dict(), default=self.myDateConvertor)
             }
         )
 
@@ -47,12 +49,7 @@ class DonationRequestsConsumer(WebsocketConsumer):
         """
         Receive a broadcast message and send it over a websocket
         """
-        
-        request = event['request']
-        utc_time = event['utc_time']
 
+        request = event['request']
         # Send message to WebSocket
-        self.send(text_data=json.dumps({
-            'request': request,
-            'utc_time': utc_time,
-        }))
+        self.send(request)
