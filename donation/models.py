@@ -2,6 +2,7 @@ from django.db import models
 from accounts.models import BloodGroupTypes, my_user
 from django.utils import timezone
 
+
 class Priority(models.TextChoices):
     HIGH = "HIGH"
     MEDIUM = "MEDIUM"
@@ -16,7 +17,7 @@ class DonationRequest(models.Model):
     time = models.DateTimeField(default=timezone.now, db_index=True)
     created_by = models.ForeignKey(
         my_user, related_name='donation_requests', on_delete=models.CASCADE)
-    priority = models.CharField(choices=Priority.choices)
+    priority = models.CharField(max_length=6, choices=Priority.choices)
 
     def as_dict(self):
-        return {'blood_group': self.blood_group, 'quantity': self.quantity, 'location': self.location, 'time': self.time}
+        return {'blood_group': self.blood_group, 'quantity': self.quantity, 'location': self.location, 'time': self.time, 'priority': self.priority}
