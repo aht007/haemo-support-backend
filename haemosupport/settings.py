@@ -29,7 +29,16 @@ ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL="accounts.my_user"
 
+ASGI_APPLICATION = "haemosupport.routing.application"
 
+CHANNEL_LAYERS = {
+  "default": {
+    "BACKEND": "channels_redis.core.RedisChannelLayer",
+    "CONFIG": {
+      "hosts": [("127.0.0.1", 6379)],
+    },
+  },
+}
 # Application definition
 
 INSTALLED_APPS = [
@@ -40,9 +49,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'accounts',
+    'channels',
     'corsheaders',
+    'accounts',
     'healthprofile',
+    'donation',
 ]
 
 MIDDLEWARE = [

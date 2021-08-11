@@ -8,6 +8,8 @@ django = "==3.2"
 djangorestframework = "*"
 djangorestframework-simplejwt = "*"
 django-cors-headers = "*"
+channels = "*"
+channels-redis = "*"
 
 [dev-packages]
 
