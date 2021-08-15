@@ -1,6 +1,6 @@
 from healthprofile.models import HealthProfile
 from healthprofile.serializers import HealthProfileSerializer
-from accounts.models import my_user
+from accounts.models import MY_USER
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from .serializers import MyTokenObtainPairSerializer, UserSerializer, RegisterSerializer, LoginSerializer
@@ -26,7 +26,7 @@ class UserRegisterView(generics.GenericAPIView):
 
     
     @staticmethod
-    @receiver(signals.post_save, sender=my_user)
+    @receiver(signals.post_save, sender=MY_USER)
     def user_save_observer(sender, instance, created, **kwargs):
         if(created):
             HealthProfile.objects.create(
@@ -63,11 +63,11 @@ class UserLoginView(generics.GenericAPIView):
         # get all users
         user = self.request.user
         if user.is_superuser:
-            queryset = my_user.objects.all().order_by('-date_joined')
+            queryset = MY_USER.objects.all().order_by('-date_joined')
             serializer = UserSerializer(queryset, many=True)
             return Response(serializer.data)
         else:
-            user = my_user.objects.filter(username=user.username)
+            user = MY_USER.objects.filter(username=user.username)
             serializer = UserSerializer(user, many=True)
             return Response(serializer.data)
 
