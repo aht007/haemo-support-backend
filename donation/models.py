@@ -1,5 +1,5 @@
 from django.db import models
-from accounts.models import BloodGroupTypes, MY_USER
+from accounts.models import BloodGroupTypes, User
 from django.utils import timezone
 
 
@@ -16,7 +16,7 @@ class DonationRequest(models.Model):
     location = models.CharField(max_length=200)
     time = models.DateTimeField(default=timezone.now, db_index=True)
     created_by = models.ForeignKey(
-        MY_USER, related_name='donation_requests', on_delete=models.CASCADE)
+        'accounts.User', related_name='donation_requests', on_delete=models.CASCADE)
     priority = models.CharField(max_length=6, choices=Priority.choices)
 
     def as_dict(self):

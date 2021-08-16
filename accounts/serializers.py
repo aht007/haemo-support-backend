@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MY_USER
+from .models import User
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 import datetime
@@ -8,7 +8,7 @@ import datetime
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = MY_USER
+        model = User
         fields = ('id', 'username', 'email', 'date_of_birth',
                   'phone_number', 'blood_group')
 
@@ -17,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
-        model = MY_USER
+        model = User
         fields = ('id', 'username', 'email', 'password',
                   'date_of_birth', 'phone_number', 'blood_group')
         extra_kwargs = {'password': {'write_only': True}}
@@ -25,7 +25,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         blood_group = validated_data.get('blood_group', None)
 
-        user = MY_USER.objects.create_user(
+        user = User.objects.create_user(
             validated_data['username'], validated_data['email'], validated_data['date_of_birth'],validated_data['phone_number'],blood_group, validated_data['password'])
         # validated data is included by django itself
         return user

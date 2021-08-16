@@ -29,7 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-AUTH_USER_MODEL="accounts.MY_USER"
+AUTH_USER_MODEL="accounts.User"
 
 ASGI_APPLICATION = "haemosupport.routing.application"
 
