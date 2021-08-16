@@ -1,28 +1,37 @@
+from haemosupport.settings import DATA_FILE
+from accounts.serializers import RegisterSerializer
 from django.core.management.base import BaseCommand
 from accounts.models import BloodGroupTypes, MY_USER
-import factory
-import factory.django
-
-class UserFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = MY_USER
-    email = factory.Faker('email')
-    username = factory.Faker('name')
-    password = factory.Faker('password')
-    date_of_birth = factory.Faker('date_of_birth')
-    phone_number = factory.Faker('phone_number')
-    blood_group = factory.Iterator(BloodGroupTypes.choices)
-    
-
+import csv
+import json
 class Command(BaseCommand):
     help = 'Seeds the Database'
     
-    def add_arguments(self, parser):
-        parser.add_argument('--users',
-            default=1,
-            type=int,
-            help='The number of users to create.')
-
     def handle(self, *args, **options):
-        for _ in range(options['users']):
-            UserFactory.create()
+        try:
+            with open(DATA_FILE) as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                line_count = 0
+                for row in csv_reader:
+                    if line_count == 0:
+                        print(f'Column names are {", ".join(row)}')
+                        line_count += 1
+                    else:
+                        data = {}
+                        data['username'] = row[0]
+                        data['password'] = row[1]
+                        data['email'] = row[2]
+                        data['date_of_birth'] = row[3]
+                        data['is_admin'] = row[4]
+                        data['phone_number'] = row[5]
+                        data['blood_group'] = row[6]
+
+                        serialaizer = RegisterSerializer(data=data)
+                        serialaizer.is_valid(raise_exception=True)
+                        serialaizer.save()
+        except(OSError):
+            print("Could not Open CSV FILE")
+        except (FileNotFoundError):
+            print("CSV FILE NOT FOUND")
+        except Exception as err:
+            print(f"Unexpected error :",repr(err))
