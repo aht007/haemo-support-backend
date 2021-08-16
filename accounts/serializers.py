@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import my_user
+from .models import User
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 import datetime
@@ -8,7 +8,7 @@ import datetime
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = my_user
+        model = User
         fields = ('id', 'username', 'email', 'date_of_birth',
                   'phone_number', 'blood_group')
 
@@ -17,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
-        model = my_user
+        model = User
         fields = ('id', 'username', 'email', 'password',
                   'date_of_birth', 'phone_number', 'blood_group')
         extra_kwargs = {'password': {'write_only': True}}
@@ -25,8 +25,8 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         blood_group = validated_data.get('blood_group', None)
 
-        user = my_user.objects.create_user(
-            validated_data['username'], validated_data['email'], validated_data['date_of_birth'],validated_data['phone_number'],blood_group, validated_data['password'])
+        user = User.objects.create_user(
+            validated_data['username'], validated_data['email'], validated_data['date_of_birth'], validated_data['phone_number'], blood_group, validated_data['password'])
         # validated data is included by django itself
         return user
 # Login
@@ -43,6 +43,7 @@ class LoginSerializer(serializers.Serializer):
         if user and user.is_active:
             return user
         raise serializers.ValidationError("Incorrect Credentials")
+
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod

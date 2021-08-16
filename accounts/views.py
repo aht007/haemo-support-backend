@@ -1,4 +1,6 @@
-from accounts.models import my_user
+from healthprofile.models import HealthProfile
+from healthprofile.serializers import HealthProfileSerializer
+from accounts.models import User
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from .serializers import MyTokenObtainPairSerializer, UserSerializer, RegisterSerializer, LoginSerializer
@@ -6,12 +8,14 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
 )
+from django.db.models import signals
+from django.dispatch import receiver
 
-
+@authentication_classes([])
+@permission_classes([])
 class UserRegisterView(generics.GenericAPIView):
     # Add a user 
-    @authentication_classes([])
-    @permission_classes([])
+
     def post(self, request, *args, **kwargs):
         serialaizer = RegisterSerializer(data=request.data)
         serialaizer.is_valid(raise_exception=True)
@@ -20,7 +24,9 @@ class UserRegisterView(generics.GenericAPIView):
             "user": UserSerializer(user, context=self.get_serializer_context()).data
         })
 
-   # Edit a User
+  
+class UserEditView(generics.GenericAPIView):
+     # Edit a User
     def patch(self, request):
         user = self.request.user
         serializer = RegisterSerializer(user, data=request.data, partial=True)
@@ -29,8 +35,6 @@ class UserRegisterView(generics.GenericAPIView):
         return Response({
             "user": UserSerializer(user, context=self.get_serializer_context()).data
         })
-
-    
 
 
 class UserLoginView(generics.GenericAPIView):
@@ -50,11 +54,11 @@ class UserLoginView(generics.GenericAPIView):
         # get all users
         user = self.request.user
         if user.is_superuser:
-            queryset = my_user.objects.all().order_by('-date_joined')
+            queryset = User.objects.all().order_by('-date_joined')
             serializer = UserSerializer(queryset, many=True)
             return Response(serializer.data)
         else:
-            user = my_user.objects.filter(username=user.username)
+            user = User.objects.filter(username=user.username)
             serializer = UserSerializer(user, many=True)
             return Response(serializer.data)
 

@@ -1,9 +1,8 @@
-from accounts.models import my_user
 from django.db import models
 
 class HealthProfile(models.Model):
     user_id = models.OneToOneField(
-        my_user, related_name='health_profile', on_delete=models.CASCADE)
+        "accounts.User", related_name='health_profile', on_delete=models.CASCADE)
     times_donated = models.IntegerField(default=0)
 
     def __str__(self):

@@ -1,6 +1,6 @@
 from accounts.serializers import RegisterSerializer
 from django.urls import path
-from .views import  MyTokenObtainPairView, UserLoginView, UserRegisterView, UserAPI
+from .views import  MyTokenObtainPairView, UserLoginView, UserRegisterView, UserAPI, UserEditView
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
@@ -12,5 +12,5 @@ urlpatterns = [
     path('auth/refresh', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/user', UserAPI.as_view()),
     path('auth/users', UserLoginView.as_view()),
-    path('auth/user/edit', UserRegisterView.as_view(), name="edit_user")
+    path('auth/user/edit', UserEditView.as_view(), name="edit_user")
 ]

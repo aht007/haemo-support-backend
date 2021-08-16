@@ -1,8 +1,10 @@
+from healthprofile.models import HealthProfile
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.validators import RegexValidator
 
 # Create your models here.
+
 
 class BloodGroupTypes(models.TextChoices):
     APositive = "A+"
@@ -15,7 +17,7 @@ class BloodGroupTypes(models.TextChoices):
     ABNegative = "AB-"
 
 
-class MyUserManager(BaseUserManager):
+class UserManager(BaseUserManager):
     def create_user(self, username, email, date_of_birth, phone_number, blood_group=None, password=None):
         """
         Creates and saves a User with the given email, date of
@@ -35,6 +37,10 @@ class MyUserManager(BaseUserManager):
         user.username = username
         user.set_password(password)
         user.save(using=self._db)
+        # initialize user's health profile
+        HealthProfile.objects.create(
+            user_id=user
+        )
         return user
 
     def create_superuser(self, username, email, date_of_birth, phone_number, blood_group=None, password=None):
@@ -53,29 +59,36 @@ class MyUserManager(BaseUserManager):
         user.is_admin = True
         user.is_superuser = True
         user.save(using=self._db)
+        # initialize user's health profile
+        return user
         return user
 
-class my_user(AbstractUser):
-    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
-    
+
+class User(AbstractUser):
+    phone_regex = RegexValidator(
+        regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+
     email = models.EmailField(unique=True)
     date_of_birth = models.DateField()
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-    phone_number = models.CharField(validators=[phone_regex], max_length=17) # validators should be a list
-    blood_group = models.CharField(max_length=3, choices=BloodGroupTypes.choices, null=True)
+    # validators should be a list
+    phone_number = models.CharField(validators=[phone_regex], max_length=17)
+    blood_group = models.CharField(
+        max_length=3, choices=BloodGroupTypes.choices, null=True)
 
-    objects = MyUserManager()
+    objects = UserManager()
 
-    REQUIRED_FIELDS = ['date_of_birth','email', 'phone_number', 'blood_group']
+    REQUIRED_FIELDS = ['date_of_birth', 'email', 'phone_number', 'blood_group']
 
     def __str__(self):
         return self.email
 
     def has_module_perms(self, app_label):
-       return self.is_superuser
+        return self.is_superuser
+
     def has_perm(self, perm, obj=None):
-       return self.is_superuser
+        return self.is_superuser
 
     @property
     def is_staff(self):
