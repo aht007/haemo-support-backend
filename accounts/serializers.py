@@ -26,7 +26,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         blood_group = validated_data.get('blood_group', None)
 
         user = User.objects.create_user(
-            validated_data['username'], validated_data['email'], validated_data['date_of_birth'],validated_data['phone_number'],blood_group, validated_data['password'])
+            validated_data['username'], validated_data['email'], validated_data['date_of_birth'], validated_data['phone_number'], blood_group, validated_data['password'])
         # validated data is included by django itself
         return user
 # Login
@@ -43,6 +43,7 @@ class LoginSerializer(serializers.Serializer):
         if user and user.is_active:
             return user
         raise serializers.ValidationError("Incorrect Credentials")
+
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod

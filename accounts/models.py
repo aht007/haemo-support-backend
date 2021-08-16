@@ -60,9 +60,6 @@ class UserManager(BaseUserManager):
         user.is_superuser = True
         user.save(using=self._db)
         # initialize user's health profile
-        HealthProfile.objects.create(
-            user_id=user
-        )
         return user
         return user
 

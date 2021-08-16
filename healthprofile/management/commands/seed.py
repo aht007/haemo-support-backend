@@ -1,7 +1,7 @@
 from haemosupport.settings import DATA_FILE
 from accounts.serializers import RegisterSerializer
 from django.core.management.base import BaseCommand
-from accounts.models import BloodGroupTypes, MY_USER
+from accounts.models import BloodGroupTypes
 import csv
 import json
 class Command(BaseCommand):
@@ -22,9 +22,8 @@ class Command(BaseCommand):
                         data['password'] = row[1]
                         data['email'] = row[2]
                         data['date_of_birth'] = row[3]
-                        data['is_admin'] = row[4]
-                        data['phone_number'] = row[5]
-                        data['blood_group'] = row[6]
+                        data['phone_number'] = row[4]
+                        data['blood_group'] = row[5]
 
                         serialaizer = RegisterSerializer(data=data)
                         serialaizer.is_valid(raise_exception=True)
