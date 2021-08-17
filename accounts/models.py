@@ -18,7 +18,7 @@ class BloodGroupTypes(models.TextChoices):
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, username, email, date_of_birth, phone_number, blood_group=None, password=None):
+    def create_user(self, username, email, date_of_birth, phone_number, blood_group=None, password=None, is_admin=False):
         """
         Creates and saves a User with the given email, date of
         birth and password.
@@ -34,6 +34,9 @@ class UserManager(BaseUserManager):
             phone_number=phone_number,
             blood_group=blood_group,
         )
+        print(is_admin)
+        if(is_admin==True):
+            user.is_admin = True
         user.username = username
         user.set_password(password)
         user.save(using=self._db)
