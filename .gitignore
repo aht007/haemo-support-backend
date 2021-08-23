@@ -6,7 +6,7 @@ __pycache__
 db.sqlite3
 media
 
-
+.vscode
 .DS_Store
 
 *.bak 

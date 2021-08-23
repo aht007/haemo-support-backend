@@ -16,9 +16,12 @@ class DonationRequest(models.Model):
     location = models.CharField(max_length=200)
     time = models.DateTimeField(default=timezone.now, db_index=True)
     created_by = models.ForeignKey(
-        'accounts.User', related_name='donation_requests', on_delete=models.CASCADE)
+        'accounts.User', related_name='donation_requests',
+        on_delete=models.CASCADE)
     priority = models.CharField(max_length=6, choices=Priority.choices)
     is_approved = models.BooleanField(default=False)
 
     def as_dict(self):
-        return {'blood_group': self.blood_group, 'quantity': self.quantity, 'location': self.location, 'time': self.time, 'priority': self.priority, 'is_approved': self.is_approved}
+        return {'blood_group': self.blood_group, 'quantity': self.quantity,
+                'location': self.location, 'time': self.time,
+                'priority': self.priority, 'is_approved': self.is_approved}

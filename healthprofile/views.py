@@ -1,9 +1,8 @@
-from healthprofile.serializers import HealthProfileSerializer, IllnessSerializer
+from healthprofile.serializers import (HealthProfileSerializer,
+                                       IllnessSerializer)
 from healthprofile.models import HealthProfile, Illness
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import authentication, permissions
 
 
 class HealthProfileView(APIView):
@@ -11,16 +10,13 @@ class HealthProfileView(APIView):
     def get(self, request, format=None):
         user = request.user
         context = {'request': request}
-        try:
+        if(hasattr(user, 'health_profile')):
             profile = user.health_profile
-        except:
+        else:
             profile = {}
-            return Response(
-                profile
-            )
-        try:
+        if(hasattr(profile, 'illness')):
             illness = profile.illness.all()
-        except:
+        else:
             illness = []
         profile = HealthProfileSerializer(profile, context=context).data
         profile['illnesses'] = IllnessSerializer(
@@ -88,7 +84,7 @@ class IllnessView(APIView):
         return Response(
             data='Wrong Parameters'
         )
-    
+
     # get illness for a specific primary key
     def get_object(self, pk):
         return Illness.objects.get(pk=pk)
@@ -112,6 +108,7 @@ class IllnessView(APIView):
             code=400, data='Wrong Parameters'
         )
     # delete an illness using primary key
+
     def delete(self, request, pk):
         obj = Illness.objects.get(pk=pk)
         profile = HealthProfile.objects.get(pk=obj.medical_profile_id.id)

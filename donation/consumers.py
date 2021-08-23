@@ -8,6 +8,7 @@ from django.db.models import signals
 from django.dispatch import receiver
 import channels.layers
 
+
 class DonationRequestsConsumer(WebsocketConsumer):
     def connect(self):
         self.user = self.scope["user"]
@@ -31,36 +32,19 @@ class DonationRequestsConsumer(WebsocketConsumer):
         if isinstance(d, datetime.datetime):
             return d.__str__()
 
-    # def receive(self, text_data):
-    #     """
-    #     Receive a message and broadcast it to a room group
-    #     """
-
-    #     text_data_json = json.loads(text_data)
-    #     request = text_data_json['request']
-    #     donationReq = DonationRequest.objects.create(**request)
-
-    #     async_to_sync(self.channel_layer.group_send)(
-    #         self.room_group_name,
-    #         {
-    #             'type': 'donation_request',
-    #             'request': json.dumps(donationReq.as_dict(), default=self.myDateConvertor)
-    #         }
-    #     )
-
     @staticmethod
     @receiver(signals.post_save, sender=DonationRequest)
     def donation_request_observer(sender, instance, created, **kwrags):
         if(created):
             data = DonationSerializer(instance).data
             layer = channels.layers.get_channel_layer()
-            async_to_sync(layer.group_send)(
-            'donations'+ str(instance.created_by.id),
-                {
-                    'type': 'donation_request',
-                    'request': json.dumps(data)
-                }
-            )
+            async_to_sync(layer.group_send)('donations' +
+                                            str(instance.created_by.id),
+                                            {
+                                                'type': 'donation_request',
+                                                'request': json.dumps(data)
+                                            }
+                                            )
 
     def donation_request(self, event):
         """

@@ -1,12 +1,12 @@
 from haemosupport.settings import DATA_FILE
 from accounts.serializers import RegisterSerializer
 from django.core.management.base import BaseCommand
-from accounts.models import BloodGroupTypes
 import csv
-import json
+
+
 class Command(BaseCommand):
     help = 'Seeds the Database'
-    
+
     def handle(self, *args, **options):
         try:
             with open(DATA_FILE) as csv_file:
@@ -33,4 +33,4 @@ class Command(BaseCommand):
         except (FileNotFoundError):
             print("CSV FILE NOT FOUND")
         except Exception as err:
-            print(f"Unexpected error :",repr(err))
+            print(f"Unexpected error :", repr(err))

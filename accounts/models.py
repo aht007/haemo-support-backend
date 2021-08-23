@@ -18,7 +18,9 @@ class BloodGroupTypes(models.TextChoices):
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, username, email, date_of_birth, phone_number, blood_group=None, password=None, is_admin=False):
+    def create_user(self, username, email, date_of_birth,
+                    phone_number, blood_group=None, password=None,
+                    is_admin=False):
         """
         Creates and saves a User with the given email, date of
         birth and password.
@@ -34,8 +36,7 @@ class UserManager(BaseUserManager):
             phone_number=phone_number,
             blood_group=blood_group,
         )
-        print(is_admin)
-        if(is_admin==True):
+        if is_admin is True:
             user.is_admin = True
         user.username = username
         user.set_password(password)
@@ -46,7 +47,8 @@ class UserManager(BaseUserManager):
         )
         return user
 
-    def create_superuser(self, username, email, date_of_birth, phone_number, blood_group=None, password=None):
+    def create_superuser(self, username, email, date_of_birth, phone_number,
+                         blood_group=None, password=None):
         """
         Creates and saves a superuser with the given email, date of
         birth and password.
@@ -69,7 +71,8 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
     phone_regex = RegexValidator(
-        regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+        regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered" +
+        "in the format: '+999999999'. Up to 15 digits allowed.")
 
     email = models.EmailField(unique=True)
     date_of_birth = models.DateField()

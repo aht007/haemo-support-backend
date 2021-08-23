@@ -26,7 +26,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         blood_group = validated_data.get('blood_group', None)
         is_admin = validated_data.get('is_admin', "0")
         user = User.objects.create_user(
-            validated_data['username'], validated_data['email'], validated_data['date_of_birth'], validated_data['phone_number'], blood_group, validated_data['password'], is_admin)
+            validated_data['username'], validated_data['email'],
+            validated_data['date_of_birth'], validated_data['phone_number'],
+            blood_group, validated_data['password'], is_admin
+            )
         # validated data is included by django itself
         return user
 # Login

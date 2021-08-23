@@ -9,20 +9,23 @@ from jwt import decode as jwt_decode
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
+
 @database_sync_to_async
 def get_user(headers):
     try:
         UntypedToken(headers)
     except (InvalidToken, TokenError) as e:
-            # Token is invalid
-            print(e)
-            return AnonymousUser
+        # Token is invalid
+        print(e)
+        return AnonymousUser
     else:
         #  Then token is valid, decode it
-        decoded_data = jwt_decode(headers, settings.SECRET_KEY, algorithms=["HS256"])
+        decoded_data = jwt_decode(
+            headers, settings.SECRET_KEY, algorithms=["HS256"])
         # Get the user using ID
         user = get_user_model().objects.get(id=decoded_data["user_id"])
         return user
+
 
 class TokenAuthMiddleware:
     def __init__(self, inner):
@@ -32,6 +35,7 @@ class TokenAuthMiddleware:
         headers = parse_qs(scope["query_string"].decode("utf8"))["token"][0]
         scope['user'] = await get_user(headers)
         return await self.inner(scope, receive, send)
+
 
 class TokenAuthMiddlewareInstance:
 
@@ -48,4 +52,5 @@ class TokenAuthMiddlewareInstance:
         return await inner(receive, send)
 
 
-TokenAuthMiddlewareStack = lambda inner: TokenAuthMiddleware(AuthMiddlewareStack(inner))
+def TokenAuthMiddlewareStack(inner): return TokenAuthMiddleware(
+    AuthMiddlewareStack(inner))

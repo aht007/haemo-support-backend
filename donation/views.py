@@ -1,14 +1,17 @@
 from donation.serializers import DonationSerializer
 from donation.models import DonationRequest
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Q
 
+
 class DonationView(APIView):
     def get(self, request):
         # get last 50 latest requests
-        data = reversed(DonationRequest.objects.filter( Q(created_by=request.user) | Q(is_approved=True) ).order_by('-time')[:50])
+        data = reversed(DonationRequest.objects.filter(
+            Q(created_by=request.user) | Q(is_approved=True)
+                ).order_by('-time')[:50]
+                )
         donation_requests = DonationSerializer(
             data, context=request, many=True).data
         return Response(
@@ -25,6 +28,7 @@ class DonationView(APIView):
             return Response(
                 data
             )
+
 
 class ModifyDonationStatusView(APIView):
     def get_object(self, pk):
