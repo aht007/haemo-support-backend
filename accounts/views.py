@@ -1,7 +1,5 @@
-from healthprofile.models import HealthProfile
-from healthprofile.serializers import HealthProfileSerializer
 from accounts.models import User
-from rest_framework import generics, permissions
+from rest_framework import generics
 from rest_framework.response import Response
 from .serializers import (MyTokenObtainPairSerializer, UserSerializer,
                           RegisterSerializer, LoginSerializer)
@@ -10,8 +8,6 @@ from rest_framework.decorators import (authentication_classes,
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
 )
-from django.db.models import signals
-from django.dispatch import receiver
 
 
 @authentication_classes([])

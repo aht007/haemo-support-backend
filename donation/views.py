@@ -1,5 +1,6 @@
 from donation.serializers import DonationSerializer
 from donation.models import DonationRequest
+from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Q
@@ -10,8 +11,8 @@ class DonationView(APIView):
         # get last 50 latest requests
         data = reversed(DonationRequest.objects.filter(
             Q(created_by=request.user) | Q(is_approved=True)
-                ).order_by('-time')[:50]
-                )
+        ).order_by('-time')[:50]
+        )
         donation_requests = DonationSerializer(
             data, context=request, many=True).data
         return Response(
@@ -47,3 +48,17 @@ class ModifyDonationStatusView(APIView):
         return Response(
             code=400, data='Wrong Parameters'
         )
+
+
+class UserRequestsView(generics.ListCreateAPIView):
+    def get_queryset(self):
+        return DonationRequest.objects.filter(created_by=self.request.user)
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        serializer = DonationSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class DonationDeleteView(generics.RetrieveDestroyAPIView):
+    queryset = DonationRequest.objects.all()

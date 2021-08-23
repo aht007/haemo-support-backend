@@ -1,5 +1,5 @@
 from django.db import models
-from accounts.models import BloodGroupTypes, User
+from accounts.models import BloodGroupTypes
 from django.utils import timezone
 
 
@@ -20,8 +20,10 @@ class DonationRequest(models.Model):
         on_delete=models.CASCADE)
     priority = models.CharField(max_length=6, choices=Priority.choices)
     is_approved = models.BooleanField(default=False)
+    is_complete = models.BooleanField(default=False)
 
     def as_dict(self):
         return {'blood_group': self.blood_group, 'quantity': self.quantity,
                 'location': self.location, 'time': self.time,
-                'priority': self.priority, 'is_approved': self.is_approved}
+                'priority': self.priority, 'is_approved': self.is_approved
+                }

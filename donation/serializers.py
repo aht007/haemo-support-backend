@@ -6,7 +6,7 @@ class DonationSerializer(serializers.ModelSerializer):
     class Meta:
         model = DonationRequest
         fields = ['id', 'blood_group', 'quantity',
-                  'location', 'priority', 'is_approved']
+                  'location', 'priority', 'is_approved', 'is_complete']
 
     def create(self, validated_data):
         donation_request = DonationRequest.objects.create(
