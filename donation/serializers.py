@@ -4,7 +4,7 @@ from .models import DonationRequest
 class DonationSerializer(serializers.ModelSerializer):
    class Meta:
       model = DonationRequest
-      fields = ['id', 'blood_group', 'quantity', 'location', 'priority']
+      fields = ['id', 'blood_group', 'quantity', 'location', 'priority', 'is_approved']
         
    def create(self, validated_data):
       donation_request = DonationRequest.objects.create(
@@ -12,3 +12,5 @@ class DonationSerializer(serializers.ModelSerializer):
             created_by = self.context['request'].user
             )
       return donation_request
+
+

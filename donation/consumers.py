@@ -8,11 +8,10 @@ from django.db.models import signals
 from django.dispatch import receiver
 import channels.layers
 
-
 class DonationRequestsConsumer(WebsocketConsumer):
     def connect(self):
-
-        self.room_group_name = 'donations'
+        self.user = self.scope["user"]
+        self.room_group_name = 'donations' + str(self.user.id)
 
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
@@ -56,7 +55,7 @@ class DonationRequestsConsumer(WebsocketConsumer):
             data = DonationSerializer(instance).data
             layer = channels.layers.get_channel_layer()
             async_to_sync(layer.group_send)(
-            'donations',
+            'donations'+ str(instance.created_by.id),
                 {
                     'type': 'donation_request',
                     'request': json.dumps(data)

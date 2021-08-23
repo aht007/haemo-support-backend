@@ -19,14 +19,14 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'password',
-                  'date_of_birth', 'phone_number', 'blood_group')
+                  'date_of_birth', 'phone_number', 'blood_group', 'is_admin')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         blood_group = validated_data.get('blood_group', None)
-
+        is_admin = validated_data.get('is_admin', "0")
         user = User.objects.create_user(
-            validated_data['username'], validated_data['email'], validated_data['date_of_birth'], validated_data['phone_number'], blood_group, validated_data['password'])
+            validated_data['username'], validated_data['email'], validated_data['date_of_birth'], validated_data['phone_number'], blood_group, validated_data['password'], is_admin)
         # validated data is included by django itself
         return user
 # Login

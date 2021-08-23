@@ -24,7 +24,7 @@ class Command(BaseCommand):
                         data['date_of_birth'] = row[3]
                         data['phone_number'] = row[4]
                         data['blood_group'] = row[5]
-
+                        data['is_admin'] = row[6]
                         serialaizer = RegisterSerializer(data=data)
                         serialaizer.is_valid(raise_exception=True)
                         serialaizer.save()
