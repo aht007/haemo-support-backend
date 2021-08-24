@@ -60,5 +60,6 @@ class UserRequestsView(generics.ListCreateAPIView):
         return Response(serializer.data)
 
 
-class DonationDeleteView(generics.RetrieveDestroyAPIView):
+class DonationDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = DonationRequest.objects.all()
+    serializer_class = DonationSerializer
