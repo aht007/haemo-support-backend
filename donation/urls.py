@@ -7,7 +7,7 @@ urlpatterns = [
          name='get_all_donation_requests'),
     path('donations/create', DonationView.as_view(),
          name='create_donation_request'),
-    path('donations/edit/<int:pk>/', ModifyDonationStatusView.as_view(),
+    path('donations/approve/', ModifyDonationStatusView.as_view(),
          name='modify_donation_status'),
     path('donations/requests/', UserRequestsView.as_view(),
          name='user_donations_requests'),
