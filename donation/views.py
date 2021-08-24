@@ -18,7 +18,7 @@ class DonationView(APIView):
                             )
         else:
             data = reversed(DonationRequest.objects.filter(
-                Q(created_by=request.user) | Q(is_approved=True)
+                Q(is_approved=True)
             ).order_by('-time')[:50]
             )
         donation_requests = DonationSerializer(
