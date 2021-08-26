@@ -36,14 +36,12 @@ class DonationRequestsConsumer(WebsocketConsumer):
     @receiver(signals.post_save, sender=DonationRequest)
     def donation_request_observer(sender, instance, created, **kwrags):
         data = DonationSerializer(instance).data
-        print(data)
-        if(instance.is_approved):
-            layer = channels.layers.get_channel_layer()
-            async_to_sync(layer.group_send)('donations', {
-                                            'type': 'donation_request',
-                                            'request': json.dumps(data)
-                                            }
-                                            )
+        layer = channels.layers.get_channel_layer()
+        async_to_sync(layer.group_send)('donations', {
+                                        'type': 'donation_request',
+                                        'request': json.dumps(data)
+                                        }
+                                        )
 
     def donation_request(self, event):
         """
