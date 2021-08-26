@@ -57,5 +57,4 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['iat'] = token.current_time
         token['user'] = user.username
         token['date'] = str(datetime.date.today())
-        token['is_admin'] = user.is_admin
         return token
