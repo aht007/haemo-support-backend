@@ -11,8 +11,8 @@ import channels.layers
 
 class DonationRequestsConsumer(WebsocketConsumer):
     def connect(self):
-        self.user = self.scope["user"]
-        self.room_group_name = 'donations' + str(self.user.id)
+
+        self.room_group_name = 'donations'
 
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
@@ -35,14 +35,13 @@ class DonationRequestsConsumer(WebsocketConsumer):
     @staticmethod
     @receiver(signals.post_save, sender=DonationRequest)
     def donation_request_observer(sender, instance, created, **kwrags):
-        if(created):
-            data = DonationSerializer(instance).data
+        data = DonationSerializer(instance).data
+        print(data)
+        if(instance.is_approved):
             layer = channels.layers.get_channel_layer()
-            async_to_sync(layer.group_send)('donations' +
-                                            str(instance.created_by.id),
-                                            {
-                                                'type': 'donation_request',
-                                                'request': json.dumps(data)
+            async_to_sync(layer.group_send)('donations', {
+                                            'type': 'donation_request',
+                                            'request': json.dumps(data)
                                             }
                                             )
 

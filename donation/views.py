@@ -1,17 +1,26 @@
+from django.core.exceptions import ValidationError
 from donation.serializers import DonationSerializer
 from donation.models import DonationRequest
+from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Q
+from rest_framework import status
 
 
 class DonationView(APIView):
     def get(self, request):
         # get last 50 latest requests
-        data = reversed(DonationRequest.objects.filter(
-            Q(created_by=request.user) | Q(is_approved=True)
-                ).order_by('-time')[:50]
-                )
+        if(request.user.is_admin):
+            data = reversed(DonationRequest.objects
+                            .filter(Q(is_approved=False))
+                            .order_by('-time')[:50]
+                            )
+        else:
+            data = reversed(DonationRequest.objects.filter(
+                Q(is_approved=True)
+            ).order_by('-time')[:50]
+            )
         donation_requests = DonationSerializer(
             data, context=request, many=True).data
         return Response(
@@ -34,16 +43,37 @@ class ModifyDonationStatusView(APIView):
     def get_object(self, pk):
         return DonationRequest.objects.get(id=pk)
 
-    def post(self, request, pk):
-        object = self.get_object(pk)
-        serializer = DonationSerializer(
-            object, data=request.data, partial=True)
-        if serializer.is_valid():
-            donation = serializer.save()
-            profile = DonationSerializer(donation, context=request).data
-            return Response(
-                profile
-            )
-        return Response(
-            code=400, data='Wrong Parameters'
-        )
+    def validate_ids(self, id_list):
+        for id in id_list:
+            try:
+                DonationRequest.objects.get(id=id)
+            except (DonationRequest.DoesNotExist, ValidationError):
+                raise status.HTTP_400_BAD_REQUEST
+        return True
+
+    def put(self, request, *args, **kwargs):
+        id_list = request.data['ids']
+        self.validate_ids(id_list=id_list)
+        instances = []
+        for id in id_list:
+            obj = self.get_object(pk=id)
+            obj.is_approved = True
+            obj.save()
+            instances.append(obj)
+        serializer = DonationSerializer(instances, many=True)
+        return Response(serializer.data)
+
+
+class UserRequestsView(generics.ListCreateAPIView):
+    def get_queryset(self):
+        return DonationRequest.objects.filter(created_by=self.request.user)
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        serializer = DonationSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class DonationUpdateDestoryView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = DonationRequest.objects.all()
+    serializer_class = DonationSerializer
