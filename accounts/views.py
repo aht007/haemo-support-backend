@@ -1,5 +1,5 @@
 from accounts.models import User
-from rest_framework import generics
+from rest_framework import generics, permissions
 from rest_framework.response import Response
 from .serializers import (MyTokenObtainPairSerializer, UserSerializer,
                           RegisterSerializer, LoginSerializer)
@@ -25,17 +25,18 @@ class UserRegisterView(generics.GenericAPIView):
         })
 
 
-class UserEditView(generics.GenericAPIView):
-    # Edit a User
-    def patch(self, request):
-        user = self.request.user
-        serializer = RegisterSerializer(user, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        return Response({
-            "user": UserSerializer(user,
-                                   context=self.get_serializer_context()).data
-        })
+class IsUserOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, user_obj):
+        return user_obj.id == request.user.id
+
+
+class UserEditView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [
+        IsUserOwner
+    ]
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 
 class UserLoginView(generics.GenericAPIView):
