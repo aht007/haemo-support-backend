@@ -1,4 +1,3 @@
-from accounts.serializers import RegisterSerializer
 from django.urls import path
 from .views import (MyTokenObtainPairView, UserLoginView, UserRegisterView,
                     UserAPI, UserEditView
