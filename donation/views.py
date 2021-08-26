@@ -1,11 +1,14 @@
-from django.core.exceptions import ValidationError
 from donation.serializers import DonationSerializer
 from donation.models import DonationRequest
-from rest_framework import generics
+from rest_framework import generics, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.db.models import Q
-from rest_framework import status
+
+
+class IsUserAuthorized(permissions.BasePermission):
+    def has_object_permission(self, request, view, donation_obj):
+        return (donation_obj.created_by.id == request.user.id
+                or request.user.is_admin)
 
 
 class DonationView(APIView):
@@ -13,12 +16,12 @@ class DonationView(APIView):
         # get last 50 latest requests
         if(request.user.is_admin):
             data = reversed(DonationRequest.objects
-                            .filter(Q(is_approved=False))
+                            .filter(is_approved=False)
                             .order_by('-time')[:50]
                             )
         else:
             data = reversed(DonationRequest.objects.filter(
-                Q(is_approved=True)
+                is_approved=True
             ).order_by('-time')[:50]
             )
         donation_requests = DonationSerializer(
@@ -39,31 +42,6 @@ class DonationView(APIView):
             )
 
 
-class ModifyDonationStatusView(APIView):
-    def get_object(self, pk):
-        return DonationRequest.objects.get(id=pk)
-
-    def validate_ids(self, id_list):
-        for id in id_list:
-            try:
-                DonationRequest.objects.get(id=id)
-            except (DonationRequest.DoesNotExist, ValidationError):
-                raise status.HTTP_400_BAD_REQUEST
-        return True
-
-    def put(self, request, *args, **kwargs):
-        id_list = request.data['ids']
-        self.validate_ids(id_list=id_list)
-        instances = []
-        for id in id_list:
-            obj = self.get_object(pk=id)
-            obj.is_approved = True
-            obj.save()
-            instances.append(obj)
-        serializer = DonationSerializer(instances, many=True)
-        return Response(serializer.data)
-
-
 class UserRequestsView(generics.ListCreateAPIView):
     def get_queryset(self):
         return DonationRequest.objects.filter(created_by=self.request.user)
@@ -75,5 +53,8 @@ class UserRequestsView(generics.ListCreateAPIView):
 
 
 class DonationUpdateDestoryView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [
+        IsUserAuthorized,
+    ]
     queryset = DonationRequest.objects.all()
     serializer_class = DonationSerializer

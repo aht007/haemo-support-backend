@@ -25,14 +25,14 @@ class UserRegisterView(generics.GenericAPIView):
         })
 
 
-class IsUserOwner(permissions.BasePermission):
+class IsUserAuthorized(permissions.BasePermission):
     def has_object_permission(self, request, view, user_obj):
         return (user_obj.id == request.user.id or request.user.is_admin)
 
 
 class UserEditView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [
-        IsUserOwner
+        IsUserAuthorized,
     ]
 
     queryset = User.objects.all()
