@@ -30,11 +30,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             validated_data['date_of_birth'], validated_data['phone_number'],
             blood_group, validated_data['password'], is_admin
             )
-        # validated data is included by django itself
         return user
 # Login
-
-# Simply authenticating so not modelSerializer
 
 
 class LoginSerializer(serializers.Serializer):

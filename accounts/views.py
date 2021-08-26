@@ -27,7 +27,7 @@ class UserRegisterView(generics.GenericAPIView):
 
 class IsUserOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, user_obj):
-        return user_obj.id == request.user.id
+        return (user_obj.id == request.user.id or request.user.is_admin)
 
 
 class UserEditView(generics.RetrieveUpdateDestroyAPIView):
