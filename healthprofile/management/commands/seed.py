@@ -33,4 +33,4 @@ class Command(BaseCommand):
         except (FileNotFoundError):
             print("CSV FILE NOT FOUND")
         except Exception as err:
-            print(f"Unexpected error :", repr(err))
+            print(f'{"Unexpected error :", repr(err)}')

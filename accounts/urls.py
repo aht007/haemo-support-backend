@@ -14,5 +14,5 @@ urlpatterns = [
     path('auth/refresh', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/user', UserAPI.as_view()),
     path('auth/users', UserLoginView.as_view()),
-    path('auth/user/edit', UserEditView.as_view(), name="edit_user"),
+    path('auth/user/<int:pk>/', UserEditView.as_view(), name="edit_user"),
 ]
