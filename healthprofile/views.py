@@ -79,6 +79,7 @@ class HealthProfileView(generics.GenericAPIView):
 
 class IsUserOwnerIllnessProfile(permissions.BasePermission):
     def has_object_permission(self, request, view, illness_profile_obj):
+        print(illness_profile_obj)
         return (illness_profile_obj.medical_profile_id
                 .user_id.id == request.user.id)
 
@@ -95,7 +96,6 @@ class IllnessView(APIView):
         if serializer.is_valid():
             data = serializer.save()
             profile = HealthProfile.objects.get(pk=data.medical_profile_id.id)
-            self.check_object_permissions(self.request, profile)
             illness = profile.illness.all() or []
             profile = HealthProfileSerializer(profile, context=request).data
             profile['illnesses'] = IllnessSerializer(
