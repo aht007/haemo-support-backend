@@ -21,6 +21,9 @@ class DonationRequest(models.Model):
     priority = models.IntegerField(choices=Priority.choices)
     is_approved = models.BooleanField(default=False)
     is_complete = models.BooleanField(default=False)
+    is_rejected = models.BooleanField(default=False)
+    description = models.CharField(max_length=500, null=True)
+    comments = models.CharField(max_length=200, null=True)
 
     def as_dict(self):
         return {'blood_group': self.blood_group, 'quantity': self.quantity,
