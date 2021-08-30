@@ -3,7 +3,8 @@ from donation.models import DonationRequest
 from rest_framework import generics, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.pagination import PageNumberPagination
+from django.db.models import Q
 
 
 class IsUserAuthorized(permissions.BasePermission):
@@ -12,16 +13,26 @@ class IsUserAuthorized(permissions.BasePermission):
                 or request.user.is_admin)
 
 
+class CustomPageNumberPagination(PageNumberPagination):
+    page_size_query_param = 'size'  # items per page
+
+
 class DonationView(APIView):
     queryset = DonationRequest.objects.all()
     serializer_class = DonationSerializer
-    pagination_class = LimitOffsetPagination
+    pagination_class = CustomPageNumberPagination
 
     def get(self, request):
 
         if(request.user.is_admin):
-            queryset = DonationRequest.objects.filter(
-                is_approved=False).order_by('-time')
+            searchFilter = self.request.query_params.get('search_term')
+            if(searchFilter is not None):
+                queryset = DonationRequest.objects.filter(
+                     Q(is_approved=False) &
+                     Q(blood_group__icontains=searchFilter)).order_by('-time')
+            else:
+                queryset = DonationRequest.objects.filter(
+                     is_approved=False).order_by('-time')
             page = self.paginate_queryset(queryset)
 
         else:

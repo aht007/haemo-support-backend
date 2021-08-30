@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import (DonationView, UserRequestsView, DonationUpdateDestoryView)
+from .views import (DonationView, UserRequestsView,
+                    DonationUpdateDestoryView)
 
 urlpatterns = [
     path('donations/', DonationView.as_view(),
