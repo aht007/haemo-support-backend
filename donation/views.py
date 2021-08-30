@@ -1,7 +1,6 @@
 from donation.serializers import DonationSerializer
 from donation.models import DonationRequest
 from rest_framework import generics, permissions
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
@@ -17,14 +16,12 @@ class CustomPageNumberPagination(PageNumberPagination):
     page_size_query_param = 'size'  # items per page
 
 
-class DonationView(APIView):
-    queryset = DonationRequest.objects.all()
+class DonationView(generics.ListCreateAPIView):
     serializer_class = DonationSerializer
     pagination_class = CustomPageNumberPagination
 
-    def get(self, request):
-
-        if(request.user.is_admin):
+    def get_queryset(self):
+        if(self.request.user.is_admin):
             searchFilter = self.request.query_params.get('search_term')
             sortOrder = self.request.query_params.get('sortOrder')
             if(searchFilter is not None and sortOrder is not None):
@@ -55,58 +52,14 @@ class DonationView(APIView):
             else:
                 queryset = DonationRequest.objects.filter(
                     is_approved=False).order_by('-time')
-            page = self.paginate_queryset(queryset)
 
         else:
             queryset = DonationRequest.objects.filter(
                 is_approved=True).order_by('-time')
-            page = self.paginate_queryset(queryset)
-
-        donation_requests = DonationSerializer(
-            page, context=request, many=True).data
-        return self.get_paginated_response(donation_requests)
-
-    def post(self, request, *args, **kwargs):
-        context = {'request': request}
-        serializer = DonationSerializer(
-            data=request.data, context=context)
-        if serializer.is_valid():
-            data = serializer.save()
-            data = DonationSerializer(data, context=context).data
-            return Response(
-                data
-            )
-
-    @property
-    def paginator(self):
-        """
-        The paginator instance associated with the view, or `None`.
-        """
-        if not hasattr(self, '_paginator'):
-            if self.pagination_class is None:
-                self._paginator = None
-            else:
-                self._paginator = self.pagination_class()
-        return self._paginator
-
-    def paginate_queryset(self, queryset):
-        """
-        Return a single page of results, or `None` if pagination is disabled.
-        """
-        if self.paginator is None:
-            return None
-        return self.paginator.paginate_queryset(queryset,
-                                                self.request, view=self)
-
-    def get_paginated_response(self, data):
-        """
-        Return a paginated style `Response` object for the given output data.
-        """
-        assert self.paginator is not None
-        return self.paginator.get_paginated_response(data)
+        return queryset
 
 
-class UserRequestsView(generics.ListCreateAPIView):
+class UserRequestsView(generics.ListAPIView):
     def get_queryset(self):
         return DonationRequest.objects.filter(created_by=self.request.user)
 
