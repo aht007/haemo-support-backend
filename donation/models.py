@@ -3,10 +3,10 @@ from accounts.models import BloodGroupTypes
 from django.utils import timezone
 
 
-class Priority(models.TextChoices):
-    HIGH = "HIGH"
-    MEDIUM = "MEDIUM"
-    LOW = "LOW"
+class Priority(models.IntegerChoices):
+    HIGH = 1
+    MEDIUM = 2
+    LOW = 3
 
 
 class DonationRequest(models.Model):
@@ -18,7 +18,7 @@ class DonationRequest(models.Model):
     created_by = models.ForeignKey(
         'accounts.User', related_name='donation_requests',
         on_delete=models.CASCADE)
-    priority = models.CharField(max_length=6, choices=Priority.choices)
+    priority = models.IntegerField(choices=Priority.choices)
     is_approved = models.BooleanField(default=False)
     is_complete = models.BooleanField(default=False)
 

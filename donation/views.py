@@ -26,13 +26,35 @@ class DonationView(APIView):
 
         if(request.user.is_admin):
             searchFilter = self.request.query_params.get('search_term')
-            if(searchFilter is not None):
+            sortOrder = self.request.query_params.get('sortOrder')
+            if(searchFilter is not None and sortOrder is not None):
+                if(sortOrder == "asc"):
+                    queryset = DonationRequest.objects.filter(
+                        Q(is_approved=False) &
+                        Q(blood_group__icontains=searchFilter)
+                    ).order_by('priority')
+                else:
+                    queryset = DonationRequest.objects.filter(
+                        Q(is_approved=False) &
+                        Q(blood_group__icontains=searchFilter)
+                    ).order_by('-priority')
+
+            elif (searchFilter is not None):
                 queryset = DonationRequest.objects.filter(
-                     Q(is_approved=False) &
-                     Q(blood_group__icontains=searchFilter)).order_by('-time')
+                    Q(is_approved=False) &
+                    Q(blood_group__icontains=searchFilter)).order_by('-time')
+            elif(sortOrder is not None):
+                if(sortOrder == "asc"):
+                    queryset = DonationRequest.objects.filter(
+                        is_approved=False
+                    ).order_by('priority')
+                else:
+                    queryset = DonationRequest.objects.filter(
+                        is_approved=False
+                    ).order_by('-priority')
             else:
                 queryset = DonationRequest.objects.filter(
-                     is_approved=False).order_by('-time')
+                    is_approved=False).order_by('-time')
             page = self.paginate_queryset(queryset)
 
         else:
