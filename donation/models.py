@@ -24,7 +24,7 @@ class DonationRequest(models.Model):
     is_rejected = models.BooleanField(default=False)
     description = models.CharField(max_length=500, null=True)
     comments = models.CharField(max_length=200, null=True)
-    searchSlug = models.SlugField(null=True)
+    search_slug = models.SlugField(null=True)
 
     def as_dict(self):
         return {'blood_group': self.blood_group, 'quantity': self.quantity,

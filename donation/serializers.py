@@ -52,6 +52,6 @@ class DonationSerializer(serializers.ModelSerializer):
         donation_request = DonationRequest.objects.create(
             **validated_data,
             created_by=self.context['request'].user,
-            searchSlug=self.switch(validated_data['blood_group'])
+            search_slug=self.switch(validated_data['blood_group'])
         )
         return donation_request
