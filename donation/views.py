@@ -1,6 +1,6 @@
 from donation.serializers import DonationSerializer
 from donation.models import DonationRequest
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, parsers
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
@@ -19,6 +19,7 @@ class CustomPageNumberPagination(PageNumberPagination):
 class DonationView(generics.ListCreateAPIView):
     serializer_class = DonationSerializer
     pagination_class = CustomPageNumberPagination
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
 
     def get_queryset(self):
         if(self.request.user.is_admin):
