@@ -32,9 +32,26 @@ class DonationSerializer(serializers.ModelSerializer):
                                               'Admin Users')
         return value
 
+    def switch(self, bloodGroup):
+        """
+        Switch Statement for getting blood group to slug mapping
+        """
+        switcher = {
+            "A+": "a_positive",
+            "B+": "b_positive",
+            "AB+": "ab_positive",
+            "O+": "o_positive",
+            "A-": "a_negative",
+            "B-": "b_negative",
+            "AB-": "ab_negative",
+            "O-": "o_negative",
+        }
+        return switcher.get(bloodGroup)
+
     def create(self, validated_data):
         donation_request = DonationRequest.objects.create(
             **validated_data,
-            created_by=self.context['request'].user
+            created_by=self.context['request'].user,
+            searchSlug=self.switch(validated_data['blood_group'])
         )
         return donation_request

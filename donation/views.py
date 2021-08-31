@@ -29,20 +29,20 @@ class DonationView(generics.ListCreateAPIView):
                     queryset = DonationRequest.objects.filter(
                         Q(is_approved=False) &
                         Q(is_rejected=False) &
-                        Q(blood_group__icontains=searchFilter)
+                        Q(searchSlug__contains=searchFilter)
                     ).order_by('priority')
                 else:
                     queryset = DonationRequest.objects.filter(
                         Q(is_approved=False) &
                         Q(is_rejected=False) &
-                        Q(blood_group__icontains=searchFilter)
+                        Q(searchSlug__contains=searchFilter)
                     ).order_by('-priority')
 
             elif (searchFilter is not None):
                 queryset = DonationRequest.objects.filter(
                     Q(is_approved=False) &
                     Q(is_rejected=False) &
-                    Q(blood_group__icontains=searchFilter)).order_by('-time')
+                    Q(searchSlug__contains=searchFilter)).order_by('-time')
             elif(sortOrder is not None):
                 if(sortOrder == "asc"):
                     queryset = DonationRequest.objects.filter(
