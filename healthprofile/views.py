@@ -134,7 +134,7 @@ class IllnessView(APIView):
 
     def delete(self, request, pk):
         obj = Illness.objects.get(pk=pk)
-        self.check_object_permissions(self.request, object)
+        self.check_object_permissions(self.request, obj)
         profile = HealthProfile.objects.get(pk=obj.medical_profile_id.id)
         obj.delete()
         illness = profile.illness.all() or []
