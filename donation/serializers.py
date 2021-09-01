@@ -3,12 +3,14 @@ from .models import DonationRequest
 
 
 class DonationSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='created_by.username', default='')
+
     class Meta:
         model = DonationRequest
         fields = ['id', 'blood_group', 'quantity',
                   'location', 'priority', 'is_approved',
                   'is_complete', 'is_rejected', 'description', 'comments',
-                  'document']
+                  'document', 'username']
 
     def validate_is_approved(self, value):
         if(value):
@@ -53,9 +55,9 @@ class DonationSerializer(serializers.ModelSerializer):
         return switcher.get(bloodGroup)
 
     def create(self, validated_data):
+        validated_data['created_by'] = self.context['request'].user
         donation_request = DonationRequest.objects.create(
             **validated_data,
-            created_by=self.context['request'].user,
             search_slug=self.switch(validated_data['blood_group'])
         )
         return donation_request
