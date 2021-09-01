@@ -22,10 +22,10 @@ class DonationRequest(models.Model):
     is_approved = models.BooleanField(default=False)
     is_complete = models.BooleanField(default=False)
     is_rejected = models.BooleanField(default=False)
-    description = models.CharField(max_length=500, null=True)
-    comments = models.CharField(max_length=200, null=True)
-    search_slug = models.SlugField(null=True)
-    document = models.FileField(null=True)
+    description = models.CharField(max_length=500, blank=True, default='')
+    comments = models.CharField(max_length=200, blank=True, default='')
+    search_slug = models.SlugField(default='')
+    document = models.FileField(blank=True, null=True, default=None)
 
     def as_dict(self):
         return {'blood_group': self.blood_group, 'quantity': self.quantity,
