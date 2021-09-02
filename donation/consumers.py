@@ -1,4 +1,4 @@
-from donation.serializers import DonationSerializer
+from donation.serializers import DonationGetSerializer
 from donation.models import DonationRequest
 import json
 import datetime
@@ -35,7 +35,7 @@ class DonationRequestsConsumer(WebsocketConsumer):
     @staticmethod
     @receiver(signals.post_save, sender=DonationRequest)
     def donation_request_observer(sender, instance, created, **kwrags):
-        data = DonationSerializer(instance).data
+        data = DonationGetSerializer(instance).data
         layer = channels.layers.get_channel_layer()
         async_to_sync(layer.group_send)('donations', {
                                         'type': 'donation_request',

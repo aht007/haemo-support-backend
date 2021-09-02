@@ -22,6 +22,7 @@ class DonationRequest(models.Model):
     is_approved = models.BooleanField(default=False)
     is_complete = models.BooleanField(default=False)
     is_rejected = models.BooleanField(default=False)
+    in_progress = models.BooleanField(default=False)
     description = models.CharField(max_length=500, blank=True, default='')
     comments = models.CharField(max_length=200, blank=True, default='')
     search_slug = models.SlugField(default='')

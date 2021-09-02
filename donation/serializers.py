@@ -2,41 +2,13 @@ from rest_framework import serializers
 from .models import DonationRequest
 
 
-class DonationSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='created_by.username', default='')
+class DonationUserActionsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DonationRequest
         fields = ['id', 'blood_group', 'quantity',
-                  'location', 'priority', 'is_approved',
-                  'is_complete', 'is_rejected', 'description', 'comments',
-                  'document', 'username']
-
-    def validate_is_approved(self, value):
-        if(value):
-            if(self.context['request'].user.is_admin is False):
-                raise serializers.ValidationError('This action is not'
-                                                  'allowed for Non'
-                                                  'Admin Users')
-        return value
-
-    def validate_is_rejected(self, value):
-        if(value):
-            if(self.context['request'].user.is_admin is False):
-                raise serializers.ValidationError('This action is not'
-                                                  'allowed for Non'
-                                                  'Admin Users')
-        return value
-
-    def validate_comments(self, value):
-        # this field is for admin only....
-        # Will add comments if rejecting a donation request
-        if(value):
-            if(self.context['request'].user.is_admin is False):
-                raise serializers.ValidationError('This action is not'
-                                                  'allowed for Non'
-                                                  'Admin Users')
-        return value
+                  'location', 'priority', 'description',
+                  'document']
 
     def switch(self, bloodGroup):
         """
@@ -61,3 +33,26 @@ class DonationSerializer(serializers.ModelSerializer):
             search_slug=self.switch(validated_data['blood_group'])
         )
         return donation_request
+
+
+class DonationGetSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='created_by.username', default='')
+
+    class Meta:
+        model = DonationRequest
+        fields = ['id', 'blood_group', 'quantity',
+                  'location', 'priority', 'is_approved',
+                  'is_rejected', 'is_complete', 'description',
+                  'document', 'username', 'in_progress', 'comments']
+
+
+class DonationAdminActionsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DonationRequest
+        fields = ['id', 'is_approved', 'is_rejected', 'comments']
+
+
+class DonationInProgressActionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DonationRequest
+        fields = ['id', 'in_progress']
