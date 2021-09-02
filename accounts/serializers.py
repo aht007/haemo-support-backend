@@ -12,8 +12,6 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'email', 'date_of_birth',
                   'phone_number', 'blood_group', 'is_admin')
 
-# Register
-
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,7 +29,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             blood_group, validated_data['password'], is_admin
             )
         return user
-# Login
 
 
 class LoginSerializer(serializers.Serializer):

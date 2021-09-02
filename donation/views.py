@@ -1,6 +1,6 @@
 from donation.serializers import DonationSerializer
 from donation.models import DonationRequest
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, parsers
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
@@ -19,41 +19,25 @@ class CustomPageNumberPagination(PageNumberPagination):
 class DonationView(generics.ListCreateAPIView):
     serializer_class = DonationSerializer
     pagination_class = CustomPageNumberPagination
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
+    filterset_fields = ['search_slug']
 
     def get_queryset(self):
+
         if(self.request.user.is_admin):
-            searchFilter = self.request.query_params.get('search_term')
             sortOrder = self.request.query_params.get('sortOrder')
-            if(searchFilter is not None and sortOrder is not None):
+            if(sortOrder is not None):
                 if(sortOrder == "asc"):
                     queryset = DonationRequest.objects.filter(
                         Q(is_approved=False) &
-                        Q(is_rejected=False) &
-                        Q(blood_group__icontains=searchFilter)
+                        Q(is_rejected=False)
                     ).order_by('priority')
                 else:
                     queryset = DonationRequest.objects.filter(
                         Q(is_approved=False) &
-                        Q(is_rejected=False) &
-                        Q(blood_group__icontains=searchFilter)
+                        Q(is_rejected=False)
                     ).order_by('-priority')
 
-            elif (searchFilter is not None):
-                queryset = DonationRequest.objects.filter(
-                    Q(is_approved=False) &
-                    Q(is_rejected=False) &
-                    Q(blood_group__icontains=searchFilter)).order_by('-time')
-            elif(sortOrder is not None):
-                if(sortOrder == "asc"):
-                    queryset = DonationRequest.objects.filter(
-                        Q(is_rejected=False) &
-                        Q(is_approved=False)
-                    ).order_by('priority')
-                else:
-                    queryset = DonationRequest.objects.filter(
-                        Q(is_rejected=False) &
-                        Q(is_approved=False)
-                    ).order_by('-priority')
             else:
                 queryset = DonationRequest.objects.filter(
                     Q(is_approved=False) &
@@ -61,7 +45,8 @@ class DonationView(generics.ListCreateAPIView):
 
         else:
             queryset = DonationRequest.objects.filter(
-                is_approved=True).order_by('-time')
+                ~Q(created_by=self.request.user) &
+                Q(is_approved=True)).order_by('-time')
         return queryset
 
 
