@@ -8,7 +8,7 @@ class DonationUserActionsSerializer(serializers.ModelSerializer):
         model = DonationRequest
         fields = ['id', 'blood_group', 'quantity',
                   'location', 'priority', 'description',
-                  'document']
+                  'document', 'is_complete']
 
     def switch(self, bloodGroup):
         """
@@ -34,6 +34,22 @@ class DonationUserActionsSerializer(serializers.ModelSerializer):
         )
         return donation_request
 
+    def update(self, instance, validated_data):
+        instance.blood_group = validated_data.get(
+            'blood_group', instance.blood_group)
+        instance.quantity = validated_data.get('quantity', instance.quantity)
+        instance.location = validated_data.get('location', instance.location)
+        instance.priority = validated_data.get('priority', instance.priority)
+        instance.description = validated_data.get(
+            'description', instance.description)
+        instance.document = validated_data.get('document', instance.document)
+        if(validated_data.get('is_complete', False) is True):
+            instance.in_progress = False
+        instance.is_complete = validated_data.get(
+            'is_complete', instance.is_complete)
+        instance.save()
+        return instance
+
 
 class DonationGetSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='created_by.username', default='')
@@ -56,3 +72,10 @@ class DonationInProgressActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = DonationRequest
         fields = ['id', 'in_progress']
+
+    def update(self, instance, validated_data):
+        if(instance.is_approved is True):
+            instance.in_progress = validated_data.get(
+                'in_progress', instance.in_progress)
+        instance.save()
+        return instance
