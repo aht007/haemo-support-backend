@@ -13,5 +13,5 @@ urlpatterns = [
     path('donations/admin_actions/<int:pk>/',
          DonationAdminActionsView.as_view(), name="donation_admin_actions"),
     path('donations/progress/<int:pk>',
-         DonationInProgressActionView, name="donation_admin_actions")
+         DonationInProgressActionView, name="donation_in_progress")
 ]
