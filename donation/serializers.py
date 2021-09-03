@@ -2,13 +2,24 @@ from rest_framework import serializers
 from .models import DonationRequest
 
 
-class DonationUserActionsSerializer(serializers.ModelSerializer):
-
+class BaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = DonationRequest
-        fields = ['id', 'blood_group', 'quantity',
-                  'location', 'priority', 'description',
-                  'document', 'is_complete']
+        fields = ['id', 'is_approved', 'is_rejected', 'comments']
+
+
+class DonationUserSerializer(BaseSerializer):
+    username = serializers.CharField(source='created_by.username', default='')
+
+    class Meta:
+        read_only_fields = ('is_approved', 'is_rejected',
+                            'in_progress', 'comments')
+        model = BaseSerializer.Meta.model
+        fields = BaseSerializer.Meta.fields+['blood_group', 'quantity',
+                                             'location', 'priority',
+                                             'is_complete', 'description',
+                                             'document', 'username',
+                                             'in_progress', ]
 
     def switch(self, bloodGroup):
         """
@@ -49,23 +60,6 @@ class DonationUserActionsSerializer(serializers.ModelSerializer):
             'is_complete', instance.is_complete)
         instance.save()
         return instance
-
-
-class DonationGetSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='created_by.username', default='')
-
-    class Meta:
-        model = DonationRequest
-        fields = ['id', 'blood_group', 'quantity',
-                  'location', 'priority', 'is_approved',
-                  'is_rejected', 'is_complete', 'description',
-                  'document', 'username', 'in_progress', 'comments']
-
-
-class DonationAdminActionsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DonationRequest
-        fields = ['id', 'is_approved', 'is_rejected', 'comments']
 
 
 class DonationInProgressActionSerializer(serializers.ModelSerializer):

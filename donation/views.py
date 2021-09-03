@@ -1,7 +1,6 @@
-from donation.serializers import (DonationAdminActionsSerializer,
-                                  DonationUserActionsSerializer,
-                                  DonationInProgressActionSerializer,
-                                  DonationGetSerializer)
+from donation.serializers import (BaseSerializer,
+                                  DonationUserSerializer,
+                                  DonationInProgressActionSerializer)
 from donation.models import DonationRequest
 from rest_framework import generics, permissions, parsers
 from rest_framework.pagination import PageNumberPagination
@@ -22,13 +21,7 @@ class DonationView(generics.ListCreateAPIView):
     pagination_class = CustomPageNumberPagination
     parser_classes = [parsers.MultiPartParser, parsers.FormParser]
     filterset_fields = ['search_slug']
-
-    def get_serializer_class(self):
-        print(self.request.method)
-        if self.request.method == 'POST':
-            return DonationUserActionsSerializer
-        if self.request.method == 'GET':
-            return DonationGetSerializer
+    serializer_class = DonationUserSerializer
 
     def get_queryset(self):
         if(self.request.user.is_admin):
@@ -63,7 +56,7 @@ class DonationView(generics.ListCreateAPIView):
 
 class UserRequestsView(generics.ListAPIView):
     pagination_class = CustomPageNumberPagination
-    serializer_class = DonationGetSerializer
+    serializer_class = DonationUserSerializer
 
     def get_queryset(self):
         return DonationRequest.objects.filter(created_by=self.request.user)
@@ -74,14 +67,14 @@ class DonationUpdateDestoryView(generics.RetrieveUpdateDestroyAPIView):
         IsUserAuthorized,
     ]
     queryset = DonationRequest.objects.all()
-    serializer_class = DonationUserActionsSerializer
+    serializer_class = DonationUserSerializer
 
 
 class DonationAdminActionsView(generics.UpdateAPIView):
     permission_classes = [
         permissions.IsAdminUser,
     ]
-    serializer_class = DonationAdminActionsSerializer
+    serializer_class = BaseSerializer
     queryset = DonationRequest.objects.all()
 
 

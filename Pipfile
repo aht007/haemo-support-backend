@@ -12,6 +12,7 @@ channels = "*"
 channels-redis = "*"
 psycopg2 = "*"
 django-filter = "*"
+sendgrid = "*"
 
 [dev-packages]
 
