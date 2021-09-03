@@ -11,9 +11,9 @@ urlpatterns = [
     path('donations/<int:pk>/', DonationUpdateDestoryView.as_view(),
          name='update_delete_donation_request'),
     path('donations/<int:pk>/approve/',
-         DonationAdminActionsView.as_view(), name="donation_admin_actions"),
+         DonationAdminActionsView.as_view(), name="donation_approve"),
     path('donations/<int:pk>/reject/',
-         DonationAdminActionsView.as_view(), name="donation_admin_actions"),
+         DonationAdminActionsView.as_view(), name="donation_reject"),
     path('donations/<int:pk>/updateProgress/',
          DonationInProgressActionView.as_view(), name="donation_in_progress")
 ]
