@@ -65,11 +65,12 @@ class DonationUserSerializer(BaseSerializer):
 class DonationInProgressActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = DonationRequest
-        fields = ['id', 'in_progress']
+        fields = ['id', 'in_progress', 'donated_by']
 
     def update(self, instance, validated_data):
         if(instance.is_approved is True):
             instance.in_progress = validated_data.get(
                 'in_progress', instance.in_progress)
+            instance.donated_by = self.context['request'].user
         instance.save()
         return instance

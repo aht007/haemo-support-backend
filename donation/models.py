@@ -18,6 +18,10 @@ class DonationRequest(models.Model):
     created_by = models.ForeignKey(
         'accounts.User', related_name='donation_requests',
         on_delete=models.CASCADE)
+    donated_by = models.ForeignKey(
+        'accounts.User', related_name='donations',
+        on_delete=models.SET_NULL, null=True
+    )
     priority = models.IntegerField(choices=Priority.choices)
     is_approved = models.BooleanField(default=False)
     is_complete = models.BooleanField(default=False)
