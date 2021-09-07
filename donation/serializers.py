@@ -46,18 +46,10 @@ class DonationUserSerializer(BaseSerializer):
         return donation_request
 
     def update(self, instance, validated_data):
-        instance.blood_group = validated_data.get(
-            'blood_group', instance.blood_group)
-        instance.quantity = validated_data.get('quantity', instance.quantity)
-        instance.location = validated_data.get('location', instance.location)
-        instance.priority = validated_data.get('priority', instance.priority)
-        instance.description = validated_data.get(
-            'description', instance.description)
-        instance.document = validated_data.get('document', instance.document)
+        super(DonationUserSerializer, self).update(
+            instance, validated_data)
         if(validated_data.get('is_complete', False) is True):
             instance.in_progress = False
-        instance.is_complete = validated_data.get(
-            'is_complete', instance.is_complete)
         instance.save()
         return instance
 
