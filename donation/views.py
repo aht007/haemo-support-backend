@@ -5,6 +5,7 @@ from donation.models import DonationRequest
 from rest_framework import generics, permissions, parsers, filters
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class IsUserAuthorized(permissions.BasePermission):
@@ -19,7 +20,7 @@ class CustomPageNumberPagination(PageNumberPagination):
 
 class DonationView(generics.ListCreateAPIView):
     pagination_class = CustomPageNumberPagination
-    filter_backends = [filters.OrderingFilter]
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
     parser_classes = [parsers.MultiPartParser, parsers.FormParser]
     filterset_fields = ['search_slug']
     serializer_class = DonationUserSerializer
