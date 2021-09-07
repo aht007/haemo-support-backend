@@ -14,6 +14,6 @@ urlpatterns = [
          DonationAdminActionsView.as_view(), name="donation_approve"),
     path('donations/<int:pk>/reject/',
          DonationAdminActionsView.as_view(), name="donation_reject"),
-    path('donations/<int:pk>/updateProgress/',
+    path('donations/<int:pk>/donate/',
          DonationInProgressActionView.as_view(), name="donation_in_progress")
 ]

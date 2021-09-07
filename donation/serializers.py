@@ -19,8 +19,7 @@ class DonationUserSerializer(BaseSerializer):
                                              'location', 'priority',
                                              'is_complete', 'description',
                                              'document', 'username',
-                                             'in_progress', 'donated_by',
-                                             'created_by']
+                                             'in_progress']
 
     def switch(self, bloodGroup):
         """
@@ -39,6 +38,7 @@ class DonationUserSerializer(BaseSerializer):
         return switcher.get(bloodGroup)
 
     def create(self, validated_data):
+        print(self.context['request'])
         validated_data['created_by'] = self.context['request'].user
         donation_request = DonationRequest.objects.create(
             **validated_data,
