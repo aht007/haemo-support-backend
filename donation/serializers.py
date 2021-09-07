@@ -19,7 +19,8 @@ class DonationUserSerializer(BaseSerializer):
                                              'location', 'priority',
                                              'is_complete', 'description',
                                              'document', 'username',
-                                             'in_progress', ]
+                                             'in_progress', 'donated_by',
+                                             'created_by']
 
     def switch(self, bloodGroup):
         """

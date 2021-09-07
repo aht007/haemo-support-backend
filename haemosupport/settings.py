@@ -180,3 +180,7 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
+
+SENDGRID_API_KEY = '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'
+
+DEFAULT_FROM_EMAIL = "ahthassan74@gmail.com"

@@ -6,6 +6,15 @@ from rest_framework import generics, permissions, parsers, filters
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
+from python_http_client import exceptions
+import sendgrid
+from sendgrid.helpers.mail import (Mail,
+                                   Email,
+                                   Personalization
+                                   )
+from haemosupport.settings import SENDGRID_API_KEY, DEFAULT_FROM_EMAIL
+from django.db.models import signals
+from django.dispatch import receiver
 
 
 class IsUserAuthorized(permissions.BasePermission):
@@ -70,3 +79,81 @@ class DonationAdminActionsView(generics.UpdateAPIView):
 class DonationInProgressActionView(generics.UpdateAPIView):
     serializer_class = DonationInProgressActionSerializer
     queryset = DonationRequest.objects.all()
+
+    @staticmethod
+    def send_mail(template_id, sender, recipient, data_dict):
+        print('here')
+        sendGridClient = sendgrid.SendGridAPIClient(SENDGRID_API_KEY)
+        mail = Mail()
+        mail.template_id = template_id
+
+        mail.from_email = Email(sender)
+        personalization = Personalization()
+        personalization.add_to(Email(recipient))
+        personalization.dynamic_template_data = data_dict
+        mail.add_personalization(personalization)
+
+        try:
+            response = sendGridClient.client.mail.send.post(
+                request_body=mail.get())
+            print(response)
+        except exceptions.BadRequestsError as e:
+            print("INSIDE")
+            print(e.body)
+
+    @staticmethod
+    @receiver(signals.post_save, sender=DonationRequest)
+    def donation_request_approve_observer(sender, instance, created, **kwrags):
+        """
+        This method will send an email to both donor and requestor
+        when a donation request becomes in progress
+        """
+        if(created is False):
+            print(instance)
+            if(instance.in_progress is True):
+                DonationInProgressActionView.send_email_to_donor(instance)
+                DonationInProgressActionView.send_email_to_requestor(instance)
+
+    @staticmethod
+    def send_email_to_donor(data):
+        recepient_email = data.donated_by.email
+        subject = "Donation Request Update"
+
+        body = {}
+        body['username'] = data.donated_by.username
+        body['donation_role'] = "Requestor"
+        body['related_name'] = data.created_by.username
+        body['phone_number'] = data.created_by.phone_number
+        body['email'] = data.created_by.email
+        body['blood_group'] = data.blood_group
+        body['quantity'] = data.quantity
+        body['priority'] = data.priority
+        body['location'] = data.location
+
+        template_id = "d-4f03429f3f1a4db5a1aa80c02e563004"
+        sender = DEFAULT_FROM_EMAIL
+        data_dict = {"subject": subject, "body": body}
+        DonationInProgressActionView.send_mail(
+            template_id, sender, recepient_email, data_dict)
+
+    @staticmethod
+    def send_email_to_requestor(data):
+        recepient_email = data.created_by.email
+        subject = "Donation Request Update"
+
+        body = {}
+        body['username'] = data.created_by.username
+        body['donation_role'] = "Donor"
+        body['related_name'] = data.donated_by.username
+        body['phone_number'] = data.donated_by.phone_number
+        body['email'] = data.donated_by.email
+        body['blood_group'] = data.blood_group
+        body['quantity'] = data.quantity
+        body['priority'] = data.priority
+        body['location'] = data.location
+
+        template_id = "d-4f03429f3f1a4db5a1aa80c02e563004"
+        sender = DEFAULT_FROM_EMAIL
+        data_dict = {"subject": subject, "body": body}
+        DonationInProgressActionView.send_mail(
+            template_id, sender, recepient_email, data_dict)
