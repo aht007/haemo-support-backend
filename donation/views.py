@@ -110,7 +110,7 @@ class DonationInProgressActionView(generics.UpdateAPIView):
         """
         if(created is False):
             print(instance)
-            if(instance.in_progress is True):
+            if(instance.in_progress is True and instance.is_complete is False):
                 DonationInProgressActionView.send_email_to_donor(instance)
                 DonationInProgressActionView.send_email_to_requestor(instance)
 
