@@ -1,3 +1,4 @@
+import requests
 from donation.serializers import (BaseSerializer,
                                   DonationUserSerializer,
                                   DonationInProgressActionSerializer)
@@ -12,9 +13,12 @@ from sendgrid.helpers.mail import (Mail,
                                    Email,
                                    Personalization
                                    )
-from haemosupport.settings import SENDGRID_API_KEY, DEFAULT_FROM_EMAIL
+from haemosupport.settings import (
+    SENDGRID_API_KEY, DEFAULT_FROM_EMAIL,
+    TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 from django.db.models import signals
 from django.dispatch import receiver
+from twilio.rest import Client
 
 
 class IsUserAuthorized(permissions.BasePermission):
@@ -111,8 +115,16 @@ class DonationInProgressActionView(generics.UpdateAPIView):
         if(created is False):
             print(instance)
             if(instance.in_progress is True and instance.is_complete is False):
-                DonationInProgressActionView.send_email_to_donor(instance)
-                DonationInProgressActionView.send_email_to_requestor(instance)
+                try:
+                    DonationInProgressActionView.send_email_to_donor(instance)
+                    DonationInProgressActionView.send_email_to_requestor(
+                        instance)
+                    DonationInProgressActionView.send_sms_to_requestor(
+                        instance)
+                    DonationInProgressActionView.send_sms_to_donor(instance)
+
+                except requests.HTTPError as exception:
+                    print(exception)
 
     @staticmethod
     def send_email_to_donor(data):
@@ -157,3 +169,30 @@ class DonationInProgressActionView(generics.UpdateAPIView):
         data_dict = {"subject": subject, "body": body}
         DonationInProgressActionView.send_mail(
             template_id, sender, recepient_email, data_dict)
+
+    @staticmethod
+    def send_sms_to_requestor(data):
+        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+        body = ("Donor {donor_name} having Phone Number{phone_number} has"
+                " accepted your request and will be"
+                " in contact with you soon".format(
+                    donor_name=data.donated_by.username,
+                    phone_number=data.donated_by.phone_number))
+        client.messages.create(
+            body=body,
+            from_=+12248084101,
+            to=data.created_by.phone_number
+        )
+
+    @staticmethod
+    def send_sms_to_donor(data):
+        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+        body = ("Requestor {requestor_name} having Phone Number{phone_number}"
+                " awaits a call from you".format(
+                    requestor_name=data.created_by.username,
+                    phone_number=data.created_by.phone_number))
+        client.messages.create(
+            body=body,
+            from_=+12248084101,
+            to=data.donated_by.phone_number
+        )
