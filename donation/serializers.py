@@ -60,7 +60,7 @@ class OnDonateActionSerializer(serializers.ModelSerializer):
         fields = ['id', 'status', 'donor']
 
     def update(self, instance, validated_data):
-        if(instance.status is Status.APPROVED):
+        if(instance.status == Status.APPROVED):
             instance.status = validated_data.get(
                 'status', instance.status
             )
