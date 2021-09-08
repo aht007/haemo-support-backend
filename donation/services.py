@@ -76,16 +76,7 @@ class MailService:
 
 class SmsService:
     @staticmethod
-    def send_sms_to_requestor(body, toNumber, fromNumber):
-        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-        client.messages.create(
-            body=body,
-            from_=fromNumber,
-            to=toNumber,
-        )
-
-    @staticmethod
-    def send_sms_to_donor(body, toNumber, fromNumber):
+    def send_sms(body, toNumber, fromNumber):
         client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
         client.messages.create(
             body=body,
