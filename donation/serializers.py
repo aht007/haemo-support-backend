@@ -53,14 +53,6 @@ class DonationUserSerializer(BaseSerializer):
         )
         return donation_request
 
-    def update(self, instance, validated_data):
-        if(instance.status is Status.APPROVED):
-            instance.status = validated_data.get(
-                'status', instance.in_progress)
-            instance.donated_by = self.context['request'].user
-        instance.save()
-        return instance
-
 
 class OnDonateActionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -69,7 +61,9 @@ class OnDonateActionSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         if(instance.status is Status.APPROVED):
-            instance.status = Status.IN_PROGRESS
+            instance.status = validated_data.get(
+                'status', instance.status
+            )
             instance.donor = self.context['request'].user
         instance.save()
         return instance
