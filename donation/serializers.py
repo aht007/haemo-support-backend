@@ -1,25 +1,33 @@
 from rest_framework import serializers
-from .models import DonationRequest
+from .models import DonationRequest, Status
 
 
 class BaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = DonationRequest
-        fields = ['id', 'is_approved', 'is_rejected', 'comments']
+        fields = ['id', 'comments', 'status']
 
 
 class DonationUserSerializer(BaseSerializer):
     username = serializers.CharField(source='created_by.username', default='')
 
     class Meta:
-        read_only_fields = ('is_approved', 'is_rejected',
-                            'in_progress', 'comments')
         model = BaseSerializer.Meta.model
         fields = BaseSerializer.Meta.fields+['blood_group', 'quantity',
                                              'location', 'priority',
-                                             'is_complete', 'description',
-                                             'document', 'username',
-                                             'in_progress']
+                                             'description', 'document',
+                                             'username',
+                                             ]
+
+    def validate_status(self, value):
+        """
+        check if status being modified is allowed for current user
+        """
+        if(self.context['request'].user.is_admin is False):
+            if(value is Status.APPROVED or value is Status.REJECTED):
+                raise serializers.ValidationError(
+                    "This Action is not Allowed for you")
+        return value
 
     def switch(self, bloodGroup):
         """
@@ -38,7 +46,6 @@ class DonationUserSerializer(BaseSerializer):
         return switcher.get(bloodGroup)
 
     def create(self, validated_data):
-        print(self.context['request'])
         validated_data['created_by'] = self.context['request'].user
         donation_request = DonationRequest.objects.create(
             **validated_data,
@@ -47,23 +54,22 @@ class DonationUserSerializer(BaseSerializer):
         return donation_request
 
     def update(self, instance, validated_data):
-        super(DonationUserSerializer, self).update(
-            instance, validated_data)
-        if(validated_data.get('is_complete', False) is True):
-            instance.in_progress = False
+        if(instance.status is Status.APPROVED):
+            instance.status = validated_data.get(
+                'status', instance.in_progress)
+            instance.donated_by = self.context['request'].user
         instance.save()
         return instance
 
 
-class DonationInProgressActionSerializer(serializers.ModelSerializer):
+class OnDonateActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = DonationRequest
-        fields = ['id', 'in_progress', 'donated_by']
+        fields = ['id', 'status', 'donor']
 
     def update(self, instance, validated_data):
-        if(instance.is_approved is True):
-            instance.in_progress = validated_data.get(
-                'in_progress', instance.in_progress)
-            instance.donated_by = self.context['request'].user
+        if(instance.status is Status.APPROVED):
+            instance.status = Status.IN_PROGRESS
+            instance.donor = self.context['request'].user
         instance.save()
         return instance
