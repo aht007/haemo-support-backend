@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (DonationAdminActionsView,
                     DonationView, UserRequestsView,
                     DonationUpdateDestoryView,
-                    OnDonateActionView)
+                    BloodDonateActionView)
 
 urlpatterns = [
     path('donations/', DonationView.as_view(),
@@ -16,5 +16,5 @@ urlpatterns = [
     path('donations/<int:pk>/reject/',
          DonationAdminActionsView.as_view(), name="donation_reject"),
     path('donations/<int:pk>/donate/',
-         OnDonateActionView.as_view(), name="donate_on_request")
+         BloodDonateActionView.as_view(), name="donate_on_request")
 ]

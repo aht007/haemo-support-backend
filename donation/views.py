@@ -1,6 +1,5 @@
-from donation.serializers import (BaseSerializer,
-                                  DonationUserSerializer,
-                                  OnDonateActionSerializer)
+from donation.serializers import (BaseSerializer, BloodDonateActionSerializer,
+                                  DonationUserSerializer)
 from donation.models import DonationRequest, Status
 from rest_framework import generics, permissions, parsers, filters
 from rest_framework.pagination import PageNumberPagination
@@ -65,6 +64,6 @@ class DonationAdminActionsView(generics.UpdateAPIView):
     queryset = DonationRequest.objects.all()
 
 
-class OnDonateActionView(generics.UpdateAPIView):
-    serializer_class = OnDonateActionSerializer
+class BloodDonateActionView(generics.UpdateAPIView):
+    serializer_class = BloodDonateActionSerializer
     queryset = DonationRequest.objects.all()

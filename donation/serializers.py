@@ -54,16 +54,14 @@ class DonationUserSerializer(BaseSerializer):
         return donation_request
 
 
-class OnDonateActionSerializer(serializers.ModelSerializer):
+class BloodDonateActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = DonationRequest
         fields = ['id', 'status', 'donor']
 
     def update(self, instance, validated_data):
         if(instance.status == Status.APPROVED):
-            instance.status = validated_data.get(
-                'status', instance.status
-            )
+            instance.status = Status.IN_PROGRESS
             instance.donor = self.context['request'].user
         instance.save()
         return instance
