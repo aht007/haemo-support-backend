@@ -8,6 +8,7 @@ from haemosupport.settings import (
     EMAIL_TEMPLATE_ID, SENDGRID_API_KEY, DEFAULT_FROM_EMAIL,
     TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 from twilio.rest import Client
+import twilio
 
 
 class MailService:
@@ -78,8 +79,11 @@ class SmsService:
     @staticmethod
     def send_sms(body, toNumber, fromNumber):
         client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-        client.messages.create(
-            body=body,
-            from_=fromNumber,
-            to=toNumber,
-        )
+        try:
+            client.messages.create(
+                body=body,
+                from_=fromNumber,
+                to=toNumber,
+            )
+        except twilio.base.exceptions.TwilioRestException as exception:
+            print(exception)
