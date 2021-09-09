@@ -1,6 +1,9 @@
 name: python_code_quality_check
 
-on: [push]
+on:
+  push:
+    paths-ignore:
+      - 'migrations/'
 
 jobs:
   build:
