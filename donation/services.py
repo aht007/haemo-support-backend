@@ -14,9 +14,13 @@ class MailService:
         subject = "Donation Request Update"
         sender = DEFAULT_FROM_EMAIL
         htmlContent = render_to_string('donation/donor.html', {data: data})
-
-        MailService.send_email(
-            sender, subject, recepient_email, htmlContent)
+        send_mail(subject, htmlContent,
+                  sender,
+                  [
+                      recepient_email,
+                  ],
+                  fail_silently=False
+                  )
 
     @staticmethod
     def send_email_to_requestor(data):
@@ -24,16 +28,10 @@ class MailService:
         subject = "Donation Request Update"
         sender = DEFAULT_FROM_EMAIL
         htmlContent = render_to_string('donation/requestor.html', {data: data})
-        print(htmlContent)
-        MailService.send_email(
-            sender, subject, recepient_email, htmlContent)
-
-    @staticmethod
-    def send_email(from_email, subject, to_email, content):
-        send_mail(subject, content,
-                  from_email,
+        send_mail(subject, htmlContent,
+                  sender,
                   [
-                      to_email
+                      recepient_email,
                   ],
                   fail_silently=False
                   )

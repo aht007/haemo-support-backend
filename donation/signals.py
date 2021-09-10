@@ -26,18 +26,18 @@ def donation_request_observer(sender, instance, created, **kwrags):
 @receiver(signals.post_save, sender=DonationRequest)
 def donation_request_approve_observer(sender, instance, created, **kwrags):
     """
-    This method will send an email to both donor and requestor
+    This method will send an email and sms to both donor and requestor
     when a donation request becomes in progress
     """
     if(created is False):
         if(instance.status == Status.IN_PROGRESS):
             try:
 
-                MailService.send_email_to_donor(
-                    instance)
+                # MailService.send_email_to_donor(
+                #     instance)
 
-                MailService.send_email_to_requestor(
-                    instance)
+                # MailService.send_email_to_requestor(
+                #     instance)
                 body = format_donor_data_for_message(instance)
                 SmsService.send_sms(
                     body, instance.donor.phone_number, +12248084101)
