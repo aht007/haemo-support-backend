@@ -1,14 +1,11 @@
 from python_http_client import exceptions
 import sendgrid
-from sendgrid.helpers.mail import (Mail,
-                                   Email,
-                                   Personalization
-                                   )
 from haemosupport.settings import (
-    EMAIL_TEMPLATE_ID, SENDGRID_API_KEY, DEFAULT_FROM_EMAIL,
+    SENDGRID_API_KEY, DEFAULT_FROM_EMAIL,
     TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 from twilio.rest import Client
 import twilio
+from django.template.loader import render_to_string
 
 
 class MailService:
@@ -16,61 +13,48 @@ class MailService:
     def send_email_to_donor(data):
         recepient_email = data.donor.email
         subject = "Donation Request Update"
-
-        body = {}
-        body['username'] = data.donor.username
-        body['donation_role'] = "Requestor"
-        body['related_name'] = data.created_by.username
-        body['phone_number'] = data.created_by.phone_number
-        body['email'] = data.created_by.email
-        body['blood_group'] = data.blood_group
-        body['quantity'] = data.quantity
-        body['priority'] = data.priority
-        body['location'] = data.location
-
-        template_id = EMAIL_TEMPLATE_ID
         sender = DEFAULT_FROM_EMAIL
-        data_dict = {"subject": subject, "body": body}
+        htmlContent = render_to_string('donation/donor.html', {data: data})
+
         MailService.send_mail(
-            template_id, sender, recepient_email, data_dict)
+            sender, subject, recepient_email, htmlContent)
 
     @staticmethod
     def send_email_to_requestor(data):
         recepient_email = data.created_by.email
         subject = "Donation Request Update"
-
-        body = {}
-        body['username'] = data.created_by.username
-        body['donation_role'] = "Donor"
-        body['related_name'] = data.donor.username
-        body['phone_number'] = data.donor.phone_number
-        body['email'] = data.donor.email
-        body['blood_group'] = data.blood_group
-        body['quantity'] = data.quantity
-        body['priority'] = data.priority
-        body['location'] = data.location
-
-        template_id = EMAIL_TEMPLATE_ID
         sender = DEFAULT_FROM_EMAIL
-        data_dict = {"subject": subject, "body": body}
+        htmlContent = render_to_string('donation/requestor.html', {data: data})
         MailService.send_mail(
-            template_id, sender, recepient_email, data_dict)
+            sender, subject, recepient_email, htmlContent)
 
     @staticmethod
-    def send_mail(template_id, sender, recipient, data_dict):
+    def send_mail(from_email, subject, to_email, content):
         sendGridClient = sendgrid.SendGridAPIClient(SENDGRID_API_KEY)
-        mail = Mail()
-        mail.template_id = template_id
-
-        mail.from_email = Email(sender)
-        personalization = Personalization()
-        personalization.add_to(Email(recipient))
-        personalization.dynamic_template_data = data_dict
-        mail.add_personalization(personalization)
-
+        data = {
+            "personalizations": [
+                {
+                    "to": [
+                        {
+                            "email": to_email
+                        }
+                    ],
+                    "subject": subject
+                }
+            ],
+            "from": {
+                "email": from_email
+            },
+            "content": [
+                {
+                    "type": "text/plain",
+                    "value": content
+                }
+            ]
+        }
         try:
             sendGridClient.client.mail.send.post(
-                request_body=mail.get())
+                request_body=data)
         except exceptions.BadRequestsError as e:
             print(e.body)
 
