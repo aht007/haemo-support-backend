@@ -9,9 +9,9 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
-from pathlib import Path
 import os
+from pathlib import Path
+
 from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -181,12 +181,14 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
-SENDGRID_API_KEY = os.environ["SENDGRID_API_KEY"]
-
-DEFAULT_FROM_EMAIL = os.environ["DEFAULT_FROM_EMAIL"]
-
 TWILIO_ACCOUNT_SID = os.environ["TWILIO_ACCOUNT_SID"]
 
 TWILIO_AUTH_TOKEN = os.environ["TWILIO_AUTH_TOKEN"]
 
-EMAIL_TEMPLATE_ID = os.environ["EMAIL_TEMPLATE_ID"]
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = os.environ["SENDGRID_API_KEY"]
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+DEFAULT_FROM_EMAIL = os.environ["DEFAULT_FROM_EMAIL"]

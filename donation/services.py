@@ -1,7 +1,6 @@
-from python_http_client import exceptions
-import sendgrid
+from django.core.mail import send_mail
 from haemosupport.settings import (
-    SENDGRID_API_KEY, DEFAULT_FROM_EMAIL,
+    DEFAULT_FROM_EMAIL,
     TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 from twilio.rest import Client
 import twilio
@@ -16,7 +15,7 @@ class MailService:
         sender = DEFAULT_FROM_EMAIL
         htmlContent = render_to_string('donation/donor.html', {data: data})
 
-        MailService.send_mail(
+        MailService.send_email(
             sender, subject, recepient_email, htmlContent)
 
     @staticmethod
@@ -25,38 +24,19 @@ class MailService:
         subject = "Donation Request Update"
         sender = DEFAULT_FROM_EMAIL
         htmlContent = render_to_string('donation/requestor.html', {data: data})
-        MailService.send_mail(
+        print(htmlContent)
+        MailService.send_email(
             sender, subject, recepient_email, htmlContent)
 
     @staticmethod
-    def send_mail(from_email, subject, to_email, content):
-        sendGridClient = sendgrid.SendGridAPIClient(SENDGRID_API_KEY)
-        data = {
-            "personalizations": [
-                {
-                    "to": [
-                        {
-                            "email": to_email
-                        }
-                    ],
-                    "subject": subject
-                }
-            ],
-            "from": {
-                "email": from_email
-            },
-            "content": [
-                {
-                    "type": "text/plain",
-                    "value": content
-                }
-            ]
-        }
-        try:
-            sendGridClient.client.mail.send.post(
-                request_body=data)
-        except exceptions.BadRequestsError as e:
-            print(e.body)
+    def send_email(from_email, subject, to_email, content):
+        send_mail(subject, content,
+                  from_email,
+                  [
+                      to_email
+                  ],
+                  fail_silently=False
+                  )
 
 
 class SmsService:
