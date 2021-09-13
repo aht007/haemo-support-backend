@@ -13,8 +13,8 @@ class MailService:
         recepient_email = data.donor.email
         subject = "Donation Request Update"
         sender = DEFAULT_FROM_EMAIL
-        htmlContent = render_to_string('donation/donor.html', {data: data})
-        send_mail(subject, htmlContent,
+        html_content = render_to_string('donation/donor.html', {"data": data})
+        send_mail(subject, html_content,
                   sender,
                   [
                       recepient_email,
@@ -27,8 +27,10 @@ class MailService:
         recepient_email = data.created_by.email
         subject = "Donation Request Update"
         sender = DEFAULT_FROM_EMAIL
-        htmlContent = render_to_string('donation/requestor.html', {data: data})
-        send_mail(subject, htmlContent,
+        html_content = render_to_string(
+            'donation/requestor.html', {"data": data})
+        print(html_content)
+        send_mail(subject, html_content,
                   sender,
                   [
                       recepient_email,

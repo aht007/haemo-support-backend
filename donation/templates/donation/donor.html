@@ -1,17 +1,12 @@
-
-{% extends "donation/base.html" %}
-
-{% block content %}
+{% extends "donation/base.html" %} {% block content %}
 
 <div class="container">
-<div class="row">
-   <div class='col text-center'>
-      Hello {{data.donor.username}}
-   </div>
-</div>
-<div class='row'>
-    <div class='col text-danger'>
-        <pre>
+  <div class="row">
+    <div class="col text-center">Hello {{data.donor.username}}</div>
+  </div>
+  <div class="row">
+    <div class="col text-danger">
+      <pre>
             Credentials of the Requestor Are:
             Name: {{data.created_by.username}}
             Phone: {{data.created_by.phone_number}}
@@ -25,9 +20,10 @@
 
             Please get in touch as soon as possible
             🩸🩸🩸Donate Blood... Save Lifes....🩸🩸🩸
-        </pre>
-        
+        </pre
+      >
     </div>
-<div>
+    <div></div>
+    {% endblock %}
+  </div>
 </div>
-{% endblock %}
