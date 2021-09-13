@@ -20,17 +20,22 @@ class DonationRequestsConsumer(WebsocketConsumer):
             self.close()
         else:
             if user.is_admin:
-                print('admin')
+                self.room_group_name = 'adminDonations'
+                # Join room group
+                async_to_sync(self.channel_layer.group_add)(
+                    self.room_group_name,
+                    self.channel_name
+                )
+                self.accept()
             else:
-                print("normal user")
+                self.room_group_name = 'userDonations'
+                # Join room group
+                async_to_sync(self.channel_layer.group_add)(
+                    self.room_group_name,
+                    self.channel_name
+                )
 
-        # Join room group
-        async_to_sync(self.channel_layer.group_add)(
-            self.room_group_name,
-            self.channel_name
-        )
-
-        self.accept()
+                self.accept()
 
     def disconnect(self, close_code):
         """
