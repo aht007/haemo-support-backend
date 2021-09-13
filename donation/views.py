@@ -1,9 +1,10 @@
-from donation.serializers import DonationSerializer
-from donation.models import DonationRequest
-from rest_framework import generics, permissions, parsers
-from rest_framework.response import Response
+from donation.serializers import (BaseSerializer, BloodDonateActionSerializer,
+                                  DonationUserSerializer)
+from donation.models import DonationRequest, Status
+from rest_framework import generics, permissions, parsers, filters
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class IsUserAuthorized(permissions.BasePermission):
@@ -17,47 +18,34 @@ class CustomPageNumberPagination(PageNumberPagination):
 
 
 class DonationView(generics.ListCreateAPIView):
-    serializer_class = DonationSerializer
     pagination_class = CustomPageNumberPagination
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
     parser_classes = [parsers.MultiPartParser, parsers.FormParser]
     filterset_fields = ['search_slug']
+    serializer_class = DonationUserSerializer
+    ordering = ['time']
+    ordering_fields = ['priority']
 
     def get_queryset(self):
-
         if(self.request.user.is_admin):
-            sortOrder = self.request.query_params.get('sortOrder')
-            if(sortOrder is not None):
-                if(sortOrder == "asc"):
-                    queryset = DonationRequest.objects.filter(
-                        Q(is_approved=False) &
-                        Q(is_rejected=False)
-                    ).order_by('priority')
-                else:
-                    queryset = DonationRequest.objects.filter(
-                        Q(is_approved=False) &
-                        Q(is_rejected=False)
-                    ).order_by('-priority')
-
-            else:
-                queryset = DonationRequest.objects.filter(
-                    Q(is_approved=False) &
-                    Q(is_rejected=False)).order_by('-time')
-
+            queryset = DonationRequest.objects.filter(
+                status=Status.PENDING
+            )
+            return queryset
         else:
             queryset = DonationRequest.objects.filter(
                 ~Q(created_by=self.request.user) &
-                Q(is_approved=True)).order_by('-time')
+                Q(status=Status.APPROVED)
+            ).order_by('-time')
         return queryset
 
 
 class UserRequestsView(generics.ListAPIView):
+    pagination_class = CustomPageNumberPagination
+    serializer_class = DonationUserSerializer
+
     def get_queryset(self):
         return DonationRequest.objects.filter(created_by=self.request.user)
-
-    def list(self, request):
-        queryset = self.get_queryset()
-        serializer = DonationSerializer(queryset, many=True)
-        return Response(serializer.data)
 
 
 class DonationUpdateDestoryView(generics.RetrieveUpdateDestroyAPIView):
@@ -65,4 +53,17 @@ class DonationUpdateDestoryView(generics.RetrieveUpdateDestroyAPIView):
         IsUserAuthorized,
     ]
     queryset = DonationRequest.objects.all()
-    serializer_class = DonationSerializer
+    serializer_class = DonationUserSerializer
+
+
+class DonationAdminActionsView(generics.UpdateAPIView):
+    permission_classes = [
+        permissions.IsAdminUser,
+    ]
+    serializer_class = BaseSerializer
+    queryset = DonationRequest.objects.all()
+
+
+class BloodDonateActionView(generics.UpdateAPIView):
+    serializer_class = BloodDonateActionSerializer
+    queryset = DonationRequest.objects.all()

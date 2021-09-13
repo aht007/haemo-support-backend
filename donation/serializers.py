@@ -1,41 +1,32 @@
 from rest_framework import serializers
-from .models import DonationRequest
+from .models import DonationRequest, Status
 
 
-class DonationSerializer(serializers.ModelSerializer):
+class BaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DonationRequest
+        fields = ['id', 'comments', 'status']
+
+
+class DonationUserSerializer(BaseSerializer):
     username = serializers.CharField(source='created_by.username', default='')
 
     class Meta:
-        model = DonationRequest
-        fields = ['id', 'blood_group', 'quantity',
-                  'location', 'priority', 'is_approved',
-                  'is_complete', 'is_rejected', 'description', 'comments',
-                  'document', 'username']
+        model = BaseSerializer.Meta.model
+        fields = BaseSerializer.Meta.fields+['blood_group', 'quantity',
+                                             'location', 'priority',
+                                             'description', 'document',
+                                             'username',
+                                             ]
 
-    def validate_is_approved(self, value):
-        if(value):
-            if(self.context['request'].user.is_admin is False):
-                raise serializers.ValidationError('This action is not'
-                                                  'allowed for Non'
-                                                  'Admin Users')
-        return value
-
-    def validate_is_rejected(self, value):
-        if(value):
-            if(self.context['request'].user.is_admin is False):
-                raise serializers.ValidationError('This action is not'
-                                                  'allowed for Non'
-                                                  'Admin Users')
-        return value
-
-    def validate_comments(self, value):
-        # this field is for admin only....
-        # Will add comments if rejecting a donation request
-        if(value):
-            if(self.context['request'].user.is_admin is False):
-                raise serializers.ValidationError('This action is not'
-                                                  'allowed for Non'
-                                                  'Admin Users')
+    def validate_status(self, value):
+        """
+        check if status being modified is allowed for current user
+        """
+        if(self.context['request'].user.is_admin is False):
+            if(value is Status.APPROVED or value is Status.REJECTED):
+                raise serializers.ValidationError(
+                    "This Action is not Allowed for you")
         return value
 
     def switch(self, bloodGroup):
@@ -61,3 +52,16 @@ class DonationSerializer(serializers.ModelSerializer):
             search_slug=self.switch(validated_data['blood_group'])
         )
         return donation_request
+
+
+class BloodDonateActionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DonationRequest
+        fields = ['id', 'status', 'donor']
+
+    def update(self, instance, validated_data):
+        if(instance.status == Status.APPROVED):
+            instance.status = Status.IN_PROGRESS
+            instance.donor = self.context['request'].user
+        instance.save()
+        return instance

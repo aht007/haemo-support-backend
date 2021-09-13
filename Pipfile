@@ -12,6 +12,8 @@ channels = "*"
 channels-redis = "*"
 psycopg2 = "*"
 django-filter = "*"
+sendgrid = "*"
+twilio = "==6.4.0"
 
 [dev-packages]
 
