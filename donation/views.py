@@ -45,7 +45,7 @@ class DonationView(generics.ListCreateAPIView):
         """
         Overriding the mehtod for custom logic for admin and user
         """
-        if(self.request.user.is_admin):
+        if self.request.user.is_admin:
             queryset = DonationRequest.objects.filter(
                 status=Status.PENDING
             )

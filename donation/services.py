@@ -18,7 +18,9 @@ class MailService:
     """
     @staticmethod
     def send_email_to_donor(data):
-
+        """
+        Function to send mail to donor
+        """
         recepient_email = data.donor.email
         subject = "Donation Request Update"
         sender = DEFAULT_FROM_EMAIL

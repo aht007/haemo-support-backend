@@ -38,8 +38,8 @@ class DonationUserSerializer(BaseSerializer):
         """
         check if status being modified is allowed for current user
         """
-        if(self.context['request'].user.is_admin is False):
-            if(value is Status.APPROVED or value is Status.REJECTED):
+        if self.context['request'].user.is_admin is False:
+            if value is Status.APPROVED or value is Status.REJECTED:
                 raise serializers.ValidationError(
                     "This Action is not Allowed for you")
         return value

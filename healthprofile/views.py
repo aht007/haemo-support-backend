@@ -27,7 +27,7 @@ class HealthProfileView(generics.GenericAPIView):
         IsUserOwnerHealthProfile
     ]
 
-    def get(self, request, format=None):
+    def get(self, request):
         """
         Get requesting User's Heatlh Profile
         """
@@ -78,10 +78,10 @@ class HealthProfileView(generics.GenericAPIView):
         """
         Patch request to update Health profile
         """
-        object = self.get_object(pk)
-        self.check_object_permissions(self.request, object)
+        to_edit_instance = self.get_object(pk)
+        self.check_object_permissions(self.request, to_edit_instance)
         serializer = HealthProfileSerializer(
-            object, data=request.data, partial=True)
+            to_edit_instance, data=request.data, partial=True)
         if serializer.is_valid():
             profile = serializer.save()
             illness = profile.illness.all() or []
