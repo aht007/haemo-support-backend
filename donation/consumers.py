@@ -20,7 +20,7 @@ class DonationRequestsConsumer(WebsocketConsumer):
             self.close()
         else:
             if user.is_admin:
-                self.room_group_name = 'adminDonations'
+                self.room_group_name = 'admin_donations'
                 # Join room group
                 async_to_sync(self.channel_layer.group_add)(
                     self.room_group_name,
@@ -28,7 +28,7 @@ class DonationRequestsConsumer(WebsocketConsumer):
                 )
                 self.accept()
             else:
-                self.room_group_name = 'userDonations'
+                self.room_group_name = 'user_donations'
                 # Join room group
                 async_to_sync(self.channel_layer.group_add)(
                     self.room_group_name,
