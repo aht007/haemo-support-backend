@@ -30,4 +30,4 @@ jobs:
       - name: Run Quality Checks
         env:
           TOXENV: ${{ matrix.toxenv }}
-        run: pipenv run tox
+        run: tox
