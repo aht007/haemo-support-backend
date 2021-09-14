@@ -88,7 +88,7 @@ class BloodDonateActionSerializer(serializers.ModelSerializer):
         overriding the update method to change status
         to in_progress and attach donor
         """
-        if(instance.status == Status.APPROVED):
+        if instance.status == Status.APPROVED:
             instance.status = Status.IN_PROGRESS
             instance.donor = self.context['request'].user
         instance.save()

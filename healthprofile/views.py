@@ -16,7 +16,7 @@ class IsUserOwnerHealthProfile(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, health_profile_obj):
-        return (health_profile_obj.user_id.id == request.user.id)
+        return health_profile_obj.user_id.id == request.user.id
 
 
 class HealthProfileView(generics.GenericAPIView):
@@ -145,9 +145,10 @@ class IllnessView(APIView):
         """
         Edit an Illness Object
         """
-        object = self.get_object(pk)
-        self.check_object_permissions(self.request, object)
-        serializer = IllnessSerializer(object, data=request.data, partial=True)
+        toEditObj = self.get_object(pk)
+        self.check_object_permissions(self.request, toEditObj)
+        serializer = IllnessSerializer(
+            toEditObj, data=request.data, partial=True)
         if serializer.is_valid():
             data = serializer.save()
             profile = HealthProfile.objects.get(pk=data.medical_profile_id.id)

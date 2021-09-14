@@ -93,4 +93,5 @@ disable =
     missing-class-docstring,
     arguments-differ,
     unexpected-keyword-arg,
+    attribute-defined-outside-init,
     
