@@ -79,17 +79,17 @@ disable =
     missing-docstring,
     invalid-name,
     bad-whitespace,
-    consider-using-enumerate
-    useless-super-delegation
-    abstract-method
-    arguments-renamed
-    no-else-return
-    invalid-name
-    import-outside-toplevel
-    unused-import
-    no-self-use
-    unused-argument
-    missing-class-docstring
-    arguments-differ
-    unexpected-keyword-arg
+    consider-using-enumerate,
+    useless-super-delegation,
+    abstract-method,
+    arguments-renamed,
+    no-else-return,
+    invalid-name,
+    import-outside-toplevel,
+    unused-import,
+    no-self-use,
+    unused-argument,
+    missing-class-docstring,
+    arguments-differ,
+    unexpected-keyword-arg,
     
