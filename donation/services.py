@@ -1,15 +1,24 @@
+"""
+Service for Email and Sms Notification
+"""
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
+
+from twilio.rest import Client
+import twilio
+
 from haemosupport.settings import (
     DEFAULT_FROM_EMAIL,
     TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-from twilio.rest import Client
-import twilio
-from django.template.loader import render_to_string
 
 
 class MailService:
+    """
+    Mail Service for donation request
+    """
     @staticmethod
     def send_email_to_donor(data):
+
         recepient_email = data.donor.email
         subject = "Donation Request Update"
         sender = DEFAULT_FROM_EMAIL
@@ -24,6 +33,9 @@ class MailService:
 
     @staticmethod
     def send_email_to_requestor(data):
+        """
+        Function to send mail to requestor
+        """
         recepient_email = data.created_by.email
         subject = "Donation Request Update"
         sender = DEFAULT_FROM_EMAIL
@@ -40,14 +52,20 @@ class MailService:
 
 
 class SmsService:
+    """
+    Sms servcice for donation request
+    """
     @staticmethod
-    def send_sms(body, toNumber, fromNumber):
+    def send_sms(body, to_number, from_number):
+        """
+        Function to send sms
+        """
         client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
         try:
             client.messages.create(
                 body=body,
-                from_=fromNumber,
-                to=toNumber,
+                from_=from_number,
+                to=to_number,
             )
         except twilio.base.exceptions.TwilioRestException as exception:
             print(exception)

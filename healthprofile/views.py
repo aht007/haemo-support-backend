@@ -1,30 +1,43 @@
-from healthprofile.serializers import (HealthProfileSerializer,
-                                       IllnessSerializer)
-from healthprofile.models import HealthProfile, Illness
+"""
+Health Profile View
+"""
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions, generics
 
+from healthprofile.serializers import (HealthProfileSerializer,
+                                       IllnessSerializer)
+from healthprofile.models import HealthProfile, Illness
+
 
 class IsUserOwnerHealthProfile(permissions.BasePermission):
+    """
+    Check User Permission for current Object
+    """
+
     def has_object_permission(self, request, view, health_profile_obj):
         return (health_profile_obj.user_id.id == request.user.id)
 
 
 class HealthProfileView(generics.GenericAPIView):
+    """
+    View for Creating, Updating and Retrieving Heatlh profile
+    """
     permission_classes = [
         IsUserOwnerHealthProfile
     ]
 
-    # to get Logged in User's Health profile
     def get(self, request, format=None):
+        """
+        Get requesting User's Heatlh Profile
+        """
         user = request.user
         context = {'request': request}
-        if(hasattr(user, 'health_profile')):
+        if hasattr(user, 'health_profile'):
             profile = user.health_profile
         else:
             profile = {}
-        if(hasattr(profile, 'illness')):
+        if hasattr(profile, 'illness'):
             illness = profile.illness.all()
         else:
             illness = []
@@ -35,8 +48,10 @@ class HealthProfileView(generics.GenericAPIView):
             profile
         )
 
-    # create a new health profile
     def post(self, request, *args, **kwargs):
+        """
+        Create Heatlh Profile for request User
+        """
         context = {'request': request}
         serializer = HealthProfileSerializer(
             data=request.data, context=context)
@@ -52,13 +67,17 @@ class HealthProfileView(generics.GenericAPIView):
         return Response(
             code=400, data='Wrong Parameters'
         )
-    # get health profile object for a specific pk
 
     def get_object(self, pk):
+        """
+        return heatlh profile for specified pk
+        """
         return HealthProfile.objects.get(user_id=pk)
 
-    # edit health profile
     def patch(self, request, pk):
+        """
+        Patch request to update Health profile
+        """
         object = self.get_object(pk)
         self.check_object_permissions(self.request, object)
         serializer = HealthProfileSerializer(
@@ -78,6 +97,10 @@ class HealthProfileView(generics.GenericAPIView):
 
 
 class IsUserOwnerIllnessProfile(permissions.BasePermission):
+    """
+    Check user authorization on illness object
+    """
+
     def has_object_permission(self, request, view, illness_profile_obj):
         print(illness_profile_obj)
         return (illness_profile_obj.medical_profile_id
@@ -85,12 +108,17 @@ class IsUserOwnerIllnessProfile(permissions.BasePermission):
 
 
 class IllnessView(APIView):
+    """
+    Illness Views
+    """
     permission_classes = [
-       IsUserOwnerIllnessProfile
+        IsUserOwnerIllnessProfile
     ]
 
-    # add a new illness
     def post(self, request, *args, **kwargs):
+        """
+        Add an Illness
+        """
         context = {'request': request}
         serializer = IllnessSerializer(data=request.data, context=context)
         if serializer.is_valid():
@@ -107,12 +135,16 @@ class IllnessView(APIView):
             data='Wrong Parameters'
         )
 
-    # get illness for a specific primary key
     def get_object(self, pk):
+        """
+        Get Illness for speicifed Pk
+        """
         return Illness.objects.get(pk=pk)
 
-    # edit an illness object
     def patch(self, request, pk):
+        """
+        Edit an Illness Object
+        """
         object = self.get_object(pk)
         self.check_object_permissions(self.request, object)
         serializer = IllnessSerializer(object, data=request.data, partial=True)
@@ -130,9 +162,11 @@ class IllnessView(APIView):
         return Response(
             code=400, data='Wrong Parameters'
         )
-    # delete an illness using primary key
 
     def delete(self, request, pk):
+        """
+        Delete An Illness Ojbect for Specified Pk
+        """
         obj = Illness.objects.get(pk=pk)
         self.check_object_permissions(self.request, obj)
         profile = HealthProfile.objects.get(pk=obj.medical_profile_id.id)

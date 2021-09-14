@@ -1,22 +1,29 @@
-from channels.auth import AuthMiddlewareStack
-from channels.db import database_sync_to_async
+"""
+Middleware for attaching user to socket request through token
+"""
 from django.contrib.auth.models import AnonymousUser
-
-from urllib.parse import parse_qs
-from rest_framework_simplejwt.tokens import UntypedToken
-from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
-from jwt import decode as jwt_decode
 from django.conf import settings
 from django.contrib.auth import get_user_model
+
+from rest_framework_simplejwt.tokens import UntypedToken
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+
+from jwt import decode as jwt_decode
+
+from channels.middleware import BaseMiddleware
+from channels.db import database_sync_to_async
 
 
 @database_sync_to_async
 def get_user(headers):
+    """
+    Extract user from token
+    """
     try:
         UntypedToken(headers)
-    except (InvalidToken, TokenError) as e:
+    except (InvalidToken, TokenError) as err:
         # Token is invalid
-        print(e)
+        print(err)
         return AnonymousUser
     else:
         #  Then token is valid, decode it
@@ -27,30 +34,25 @@ def get_user(headers):
         return user
 
 
-class TokenAuthMiddleware:
+class TokenAuthMiddleware(BaseMiddleware):
+    """
+    Middleware Class
+    """
+
     def __init__(self, inner):
-        self.inner = inner
+        """
+        Initialize Instance properly
+        """
+        super().__init__(inner)
 
     async def __call__(self, scope, receive, send):
-        headers = parse_qs(scope["query_string"].decode("utf8"))["token"][0]
-        scope['user'] = await get_user(headers)
-        return await self.inner(scope, receive, send)
-
-
-class TokenAuthMiddlewareInstance:
-
-    def __init__(self, scope, middleware):
-        self.middleware = middleware
-        self.scope = dict(scope)
-        self.inner = self.middleware.inner
-
-    async def __call__(self, receive, send):
-        headers = dict(self.scope['headers'])
-        if b'authorization' in headers:
-            self.scope['user'] = await get_user(headers)
-        inner = self.inner(self.scope)
-        return await inner(receive, send)
-
-
-def TokenAuthMiddlewareStack(inner): return TokenAuthMiddleware(
-    AuthMiddlewareStack(inner))
+        """
+        Get token and attach user to request
+        """
+        try:
+            token_key = (dict((x.split('=') for x in scope['query_string']
+                               .decode().split("&")))).get('token', None)
+        except ValueError:
+            token_key = None
+        scope['user'] = get_user(token_key)
+        return await super().__call__(scope, receive, send)

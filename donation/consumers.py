@@ -1,11 +1,20 @@
-import datetime
+"""
+Consumer for Donation App
+"""
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
 
 class DonationRequestsConsumer(WebsocketConsumer):
-    def connect(self):
+    """
+    Donation Requests Consumer for communication
+    through web sockets
+    """
 
+    def connect(self):
+        """
+        Connect method for web socket
+        """
         self.room_group_name = 'donations'
 
         # Join room group
@@ -17,14 +26,13 @@ class DonationRequestsConsumer(WebsocketConsumer):
         self.accept()
 
     def disconnect(self, close_code):
+        """
+        Dicconnect method for web socket
+        """
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name,
             self.channel_name
         )
-
-    def myDateConvertor(self, d):
-        if isinstance(d, datetime.datetime):
-            return d.__str__()
 
     def donation_request(self, event):
         """

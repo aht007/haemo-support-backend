@@ -1,6 +1,8 @@
-from donation.models import DonationRequest
+"""
+Django Admin Config for Donation App
+"""
 from django.contrib import admin
+from donation.models import DonationRequest
 
-# Register your models here.
 
 admin.site.register(DonationRequest)
