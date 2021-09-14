@@ -3,6 +3,7 @@ Service for Email and Sms Notification
 """
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 from twilio.rest import Client
 import twilio
@@ -25,11 +26,13 @@ class MailService:
         subject = "Donation Request Update"
         sender = DEFAULT_FROM_EMAIL
         html_content = render_to_string('donation/donor.html', {"data": data})
-        send_mail(subject, html_content,
+        plain_text = strip_tags(html_content)
+        send_mail(subject, plain_text,
                   sender,
                   [
                       recepient_email,
                   ],
+                  html_message=html_content,
                   fail_silently=False
                   )
 
@@ -43,12 +46,13 @@ class MailService:
         sender = DEFAULT_FROM_EMAIL
         html_content = render_to_string(
             'donation/requestor.html', {"data": data})
-        print(html_content)
-        send_mail(subject, html_content,
+        plain_text = strip_tags(html_content)
+        send_mail(subject, plain_text,
                   sender,
                   [
                       recepient_email,
                   ],
+                  html_message=html_content,
                   fail_silently=False
                   )
 

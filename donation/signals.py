@@ -45,11 +45,11 @@ def donation_request_approve_observer(sender, instance, created, **kwargs):
         if instance.status == Status.IN_PROGRESS:
             try:
 
-                # MailService.send_email_to_donor(
-                #     instance)
+                MailService.send_email_to_donor(
+                    instance)
 
-                # MailService.send_email_to_requestor(
-                #     instance)
+                MailService.send_email_to_requestor(
+                    instance)
                 body = format_donor_data_for_message(instance)
                 SmsService.send_sms(
                     body, instance.donor.phone_number, +12248084101)
