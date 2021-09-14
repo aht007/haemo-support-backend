@@ -1,4 +1,4 @@
-disable=
+disable =
     too-many-instance-attributes,
     len-as-condition,
     too-few-public-methods,
