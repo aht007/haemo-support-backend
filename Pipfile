@@ -19,7 +19,6 @@ twilio = "==6.4.0"
 pytest = "*"
 tox = "*"
 pylint = "*"
-isort = "*"
 
 [requires]
 python_version = "3.9"

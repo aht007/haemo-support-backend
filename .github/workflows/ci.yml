@@ -7,7 +7,6 @@ on:
     branches:
       - "**"
 
-
 jobs:
   run_tests:
     name: Tests
@@ -15,26 +14,20 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-20.04]
-        python-version: ['3.9']
+        python-version: ["3.9"]
         toxenv: [django32-drflatest, quality]
 
     steps:
-        - uses: actions/checkout@v1
-        - name: Set up Python 3.9
-          uses: actions/setup-python@v2
-          with:
-            python-version: 3.9
-        - name: Install pipenv
-          run: pip install pipenv
+      - uses: actions/checkout@v1
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
 
-        - name: Install Dependencies
-          run: pipenv install
-        
-        - name: Install Dev Dependencies
-          run: pipenv install --dev
+      - name: Install Dependencies
+        run: pip install pytest tox pylint
 
-        - name: Run Quality Checks
-          env:
-            TOXENV: ${{ matrix.toxenv }}
-          run: pipenv run tox
-
+      - name: Run Quality Checks
+        env:
+          TOXENV: ${{ matrix.toxenv }}
+        run: pipenv run tox
