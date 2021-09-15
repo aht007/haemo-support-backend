@@ -22,13 +22,13 @@ def donation_request_observer(sender, instance, created, **kwargs):
     data = DonationUserSerializer(instance).data
     layer = channels.layers.get_channel_layer()
     if(instance.status == Status.PENDING):
-        async_to_sync(layer.group_send)('admin_donations', {
+        async_to_sync(layer.group_send)('adminDonations', {
             'type': 'donation_request',
             'request': json.dumps(data)
         }
         )
     else:
-        async_to_sync(layer.group_send)('user_donations', {
+        async_to_sync(layer.group_send)('userDonations', {
             'type': 'donation_request',
             'request': json.dumps(data)
         }
