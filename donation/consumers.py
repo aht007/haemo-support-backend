@@ -15,15 +15,27 @@ class DonationRequestsConsumer(WebsocketConsumer):
         """
         Connect method for web socket
         """
-        self.room_group_name = 'donations'
+        user = self.scope['user']
+        if user.is_anonymous:
+            self.close()
+        else:
+            if user.is_admin:
+                self.room_group_name = 'admin_donations'
+                # Join room group
+                async_to_sync(self.channel_layer.group_add)(
+                    self.room_group_name,
+                    self.channel_name
+                )
+                self.accept()
+            else:
+                self.room_group_name = 'user_donations'
+                # Join room group
+                async_to_sync(self.channel_layer.group_add)(
+                    self.room_group_name,
+                    self.channel_name
+                )
 
-        # Join room group
-        async_to_sync(self.channel_layer.group_add)(
-            self.room_group_name,
-            self.channel_name
-        )
-
-        self.accept()
+                self.accept()
 
     def disconnect(self, close_code):
         """
