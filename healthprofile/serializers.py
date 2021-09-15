@@ -11,6 +11,7 @@ class HealthProfileSerializer(serializers.ModelSerializer):
     Health Profile Model Serializer
     """
     class Meta:
+        # pylint: disable=missing-class-docstring
         model = HealthProfile
         fields = ['id', 'times_donated']
 
@@ -30,6 +31,7 @@ class IllnessSerializer(serializers.ModelSerializer):
     Illness Model Serializer
     """
     class Meta:
+        # pylint: disable=missing-class-docstring
         model = Illness
         fields = ['id', 'name', 'date_occured', 'date_cured']
 
