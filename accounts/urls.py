@@ -1,10 +1,14 @@
+"""
+URLS for Accounts App
+"""
 from django.urls import path
-from .views import (MyTokenObtainPairView, UserLoginView, UserRegisterView,
-                    UserAPI, UserEditView
-                    )
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
+
+from .views import (MyTokenObtainPairView, UserLoginView, UserRegisterView,
+                    UserAPI, UserEditView
+                    )
 
 
 urlpatterns = [

@@ -1,23 +1,34 @@
-from healthprofile.models import HealthProfile
+"""
+Models for Accounts App
+"""
+
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.validators import RegexValidator
 
-# Create your models here.
+from healthprofile.models import HealthProfile
 
 
 class BloodGroupTypes(models.TextChoices):
-    APositive = "A+"
-    ANegative = "A-"
-    BPositive = "B+"
-    BNegative = "B-"
-    OPositive = "O+"
-    ONegative = "O-"
-    ABPositive = "AB+"
-    ABNegative = "AB-"
+    """
+    Blood Group Choices for blood group field
+    """
+    A_POSITIVE = "A+"
+    A_NEGATIVE = "A-"
+    B_POSITIVE = "B+"
+    B_NEGATIVE = "B-"
+    O_POSITIVE = "O+"
+    O_NEGATIVE = "O-"
+    AB_POSITIVE = "AB+"
+    AB_NEGATIVE = "AB-"
 
 
 class UserManager(BaseUserManager):
+    """
+    Custom User Manager
+    """
+
     def create_user(self, username, email, date_of_birth,
                     phone_number, blood_group=None, password=None,
                     is_admin=False):
@@ -66,10 +77,12 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         # initialize user's health profile
         return user
-        return user
 
 
 class User(AbstractUser):
+    """
+    Custom User Class
+    """
     phone_regex = RegexValidator(
         regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered"
         "in the format: '+999999999'. Up to 15 digits allowed.")
@@ -88,16 +101,26 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['date_of_birth', 'email', 'phone_number', 'blood_group']
 
     def __str__(self):
+        """
+        return string representation of user model
+        """
         return self.email
 
     def has_module_perms(self, app_label):
+        """
+        check if user has module permission
+        """
         return self.is_superuser
 
     def has_perm(self, perm, obj=None):
+        """
+        check if user has permission
+        """
         return self.is_superuser
 
     @property
     def is_staff(self):
-        "Is the user a member of staff?"
-        # Simplest possible answer: All admins are staff
+        """
+        Check if user is staff member
+        """
         return self.is_admin

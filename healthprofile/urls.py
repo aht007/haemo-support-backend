@@ -1,3 +1,6 @@
+"""
+URLS for Health Profile App
+"""
 from django.urls import path
 from .views import HealthProfileView, IllnessView
 

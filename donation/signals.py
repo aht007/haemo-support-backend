@@ -1,16 +1,21 @@
-from donation.services import MailService, SmsService
+"""
+Signals for Donation App
+"""
+import json
+import requests
 from django.db.models import signals
 from django.dispatch import receiver
+
+from asgiref.sync import async_to_sync
 import channels.layers
+
+from donation.services import MailService, SmsService
 from donation.serializers import DonationUserSerializer
 from donation.models import DonationRequest, Status
-import json
-from asgiref.sync import async_to_sync
-import requests
 
 
 @receiver(signals.post_save, sender=DonationRequest)
-def donation_request_observer(sender, instance, created, **kwrags):
+def donation_request_observer(sender, instance, created, **kwargs):
     """
     Pushes New donation requests to frontend
     """
@@ -24,13 +29,13 @@ def donation_request_observer(sender, instance, created, **kwrags):
 
 
 @receiver(signals.post_save, sender=DonationRequest)
-def donation_request_approve_observer(sender, instance, created, **kwrags):
+def donation_request_approve_observer(sender, instance, created, **kwargs):
     """
     This method will send an email and sms to both donor and requestor
     when a donation request becomes in progress
     """
-    if(created is False):
-        if(instance.status == Status.IN_PROGRESS):
+    if created is False:
+        if instance.status == Status.IN_PROGRESS:
             try:
 
                 # MailService.send_email_to_donor(
@@ -50,6 +55,9 @@ def donation_request_approve_observer(sender, instance, created, **kwrags):
 
 
 def format_requestor_data_for_message(instance):
+    """
+    Formats Requestor data in a format to send through sms
+    """
     body = ("Donor {donor_name} having Phone Number{phone_number} has"
             " accepted your request and will be"
             " in contact with you soon".format(
@@ -59,6 +67,9 @@ def format_requestor_data_for_message(instance):
 
 
 def format_donor_data_for_message(instance):
+    """
+    Formats Donor data in a format to send through sms
+    """
     body = ("Requestor {requestor_name} having Phone Number{phone_number}"
             " awaits a call from you".format(
                 requestor_name=instance.created_by.username,

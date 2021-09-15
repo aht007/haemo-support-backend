@@ -16,6 +16,9 @@ sendgrid = "*"
 twilio = "==6.4.0"
 
 [dev-packages]
+pytest = "*"
+tox = "*"
+pylint = "*"
 
 [requires]
 python_version = "3.9"
