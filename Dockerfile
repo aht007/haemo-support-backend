@@ -5,4 +5,3 @@ WORKDIR /haemo_support_backend
 COPY . /haemo_support_backend
 RUN pip install pipenv
 RUN pipenv install --system
-CMD python manage.py runserver
