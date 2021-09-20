@@ -3,5 +3,6 @@ ENV PYTHONUNBUFFERED 1
 RUN mkdir /haemo_support_backend
 WORKDIR /haemo_support_backend
 COPY . /haemo_support_backend
+EXPOSE 8000
 RUN pip install pipenv
 RUN pipenv install --system

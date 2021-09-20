@@ -121,3 +121,7 @@ GitHub.sublime-settings
 .history
 env.txt
 data
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
