@@ -1,3 +1,4 @@
+# pylint: disable=pointless-string-statement
 """
 Signals for Donation App
 """
@@ -65,11 +66,11 @@ def format_requestor_data_for_message(instance):
     """
     Formats Requestor data in a format to send through sms
     """
-    body = ("Donor {donor_name} having Phone Number{phone_number} has"
-            " accepted your request and will be"
-            " in contact with you soon".format(
-                donor_name=instance.donor.username,
-                phone_number=instance.donor.phone_number))
+    donor_name = instance.donor.username
+    phone_number = instance.donor.phone_number
+    body = f"Donor {donor_name} having Phone Number{phone_number} has"
+    " accepted your request and will be"
+    " in contact with you soon"
     return body
 
 
@@ -77,9 +78,8 @@ def format_donor_data_for_message(instance):
     """
     Formats Donor data in a format to send through sms
     """
-    body = ("Requestor {requestor_name} having Phone Number{phone_number}"
-            " awaits a call from you".format(
-                requestor_name=instance.created_by.username,
-                phone_number=instance.created_by.phone_number))
-
+    requestor_name = instance.created_by.username
+    phone_number = instance.created_by.phone_number
+    body = f"Requestor {requestor_name} having Phone Number{phone_number} "
+    "awaits a call from you"
     return body
