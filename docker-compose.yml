@@ -12,7 +12,7 @@ services:
 
   web:
     build: .
-    command: bash -c 'python manage.py runserver 0.0.0.0:8000'
+    command: "python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/haemo_support_backend
     ports:
