@@ -3,12 +3,12 @@ version: "3.9"
 services:
   db:
     image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=haemoUser
       - POSTGRES_PASSWORD=Aht123786
-      - POSTGRES_DB=haemoSupport
-  redis:
-    image: redis:alpine
+      - POSTGRES_DB=docker_tests
 
   web:
     build: .
@@ -20,7 +20,4 @@ services:
     env_file:
       - ./env.txt
     depends_on:
-      db:
-        condition: service_started
-      redis:
-        condition: service_started
+      - db
