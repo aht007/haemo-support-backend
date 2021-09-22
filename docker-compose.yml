@@ -7,13 +7,14 @@ services:
       - POSTGRES_DB=haemoSupport
   redis:
     image: redis:alpine
+
   web:
     image: 156926091891.dkr.ecr.us-west-2.amazonaws.com/haemo-support-backend:latest
-   command: >
-     sh -c "python manage.py migrate &&
-            python manage.py runserver 0.0.0.0:8000"
-   ports:
-     - "8000:8000"
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
     env_file:
       - ./env.txt
     depends_on:
