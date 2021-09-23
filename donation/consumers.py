@@ -15,6 +15,7 @@ class DonationRequestsConsumer(WebsocketConsumer):
         """
         Connect method for web socket
         """
+
         user = self.scope['user']
         if user.is_anonymous:
             self.close()
