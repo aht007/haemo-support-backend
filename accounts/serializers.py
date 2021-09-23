@@ -69,10 +69,13 @@ class LoginSerializer(serializers.Serializer):
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     """
-    Adding custom claims to jwt token
+    Token obatain serializer class override for custom claims
     """
     @classmethod
     def get_token(cls, user):
+        """
+        Adding custom claims
+        """
         token = super().get_token(user)
 
         # Add custom claims
