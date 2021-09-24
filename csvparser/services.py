@@ -7,6 +7,15 @@ from collections import defaultdict
 from django.core.exceptions import ValidationError
 
 
+def decode_utf8(input_iterator):
+    """
+    Generator that decodes a utf-8 encoded
+    input line by line
+    """
+    for line in input_iterator:
+        yield line if isinstance(line, str) else line.decode('utf-8')
+
+
 class Csv_Parser:
     """
     CSV Parser Class for adding bulk donor users
@@ -42,13 +51,14 @@ class Csv_Parser:
         """
         data_list = []
         try:
-            with open(self.file, 'r', encoding="UTF-8") as openedFile:
-                reader = csv.DictReader(openedFile)
-                self.validate_file(reader)
-                for row in reader:
-                    valid_row = self.validate_row(row)
-                    if valid_row:
-                        data_list.append(row)
+            reader = csv.DictReader(decode_utf8(self.file))
+            print(reader)
+            self.validate_file(reader)
+            for row in reader:
+                print(row)
+                valid_row = self.validate_row(row)
+                if valid_row:
+                    data_list.append(row)
 
             return data_list
 

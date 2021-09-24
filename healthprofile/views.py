@@ -92,7 +92,7 @@ class HealthProfileView(generics.GenericAPIView):
                 profile
             )
         return Response(
-            code=400, data='Wrong Parameters'
+            data='Wrong Parameters'
         )
 
 
