@@ -5,7 +5,6 @@ import csv
 from accounts.serializers import RegisterSerializer
 
 
-
 def decode_utf8(input_iterator):
     """
     Generator that decodes a utf-8 encoded
