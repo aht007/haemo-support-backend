@@ -3,7 +3,6 @@ CSV Parser Service
 """
 from accounts.serializers import RegisterSerializer
 import csv
-from collections import defaultdict
 from django.core.exceptions import ValidationError
 
 
@@ -25,13 +24,13 @@ class Csv_Parser:
 
     def __init__(self, file):
         self.file = file
-        self.error_messages = defaultdict(list)
+        self.error_messages = []
 
-    def add_error(self, message, row=0):
+    def add_error(self, message):
         """
         Add an error message to error_messages list
         """
-        self.error_messages[message].append(row)
+        self.error_messages.append(message)
 
     def validate_file(self, file_reader):
         """
@@ -40,8 +39,7 @@ class Csv_Parser:
         if self.required_columns:
             for field in self.required_columns:
                 if field not in file_reader.fieldnames:
-                    raise ValidationError(
-                        f"Missing column: {field}")
+                    self.add_error(f"Missing column: {field}")
 
     # pylint: disable=inconsistent-return-statements
 
@@ -50,21 +48,16 @@ class Csv_Parser:
         Create a CSV reader and validate the file.
         """
         data_list = []
-        try:
-            reader = csv.DictReader(decode_utf8(self.file))
-            print(reader)
-            self.validate_file(reader)
-            for row in reader:
-                print(row)
-                valid_row = self.validate_row(row)
-                if valid_row:
-                    data_list.append(row)
+        reader = csv.DictReader(decode_utf8(self.file))
 
-            return data_list
+        self.validate_file(reader)
 
-        except ValidationError as exc:
-            self.add_error(str(exc))
-            return []
+        for row in reader:
+            valid_row = self.validate_row(row)
+            if valid_row:
+                data_list.append(row)
+
+        return data_list
 
     def validate_row(self, row):
         """
