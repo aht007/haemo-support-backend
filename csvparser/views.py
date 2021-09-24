@@ -1,5 +1,3 @@
-# pylint: disable-all
-import csv
 from rest_framework import generics
 from rest_framework.decorators import (authentication_classes,
                                        permission_classes)

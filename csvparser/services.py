@@ -1,9 +1,9 @@
 """
 CSV Parser Service
 """
-from accounts.serializers import RegisterSerializer
 import csv
-from django.core.exceptions import ValidationError
+from accounts.serializers import RegisterSerializer
+
 
 
 def decode_utf8(input_iterator):
