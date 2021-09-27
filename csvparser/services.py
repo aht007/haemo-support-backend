@@ -1,3 +1,4 @@
+# pylint: disable=no-else-raise
 """
 CSV Parser Service
 """
@@ -28,6 +29,8 @@ def validate_username(value):
         r'[A-Za-z][A-Za-z0-9_]{7,29}')
     if not reg.match(value):
         raise ValidationError(f'{value} is not valid for column username')
+    else:
+        return True
 
 
 def validate_email(value):
@@ -39,6 +42,8 @@ def validate_email(value):
         '[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})')
     if not reg.match(value):
         raise ValidationError(f'{value} is not valid for column email')
+    else:
+        return True
 
 
 def validate_password(value):
@@ -48,6 +53,8 @@ def validate_password(value):
     reg = re.compile(r'(?=.*[a-z])(?=.*[A-Z])[A-Za-z\d@$!#%*?&]{8,18}')
     if not reg.match(value):
         raise ValidationError(f'{value} is not valid for column password')
+    else:
+        return True
 
 
 def validate_date_of_birth(value):
@@ -58,6 +65,8 @@ def validate_date_of_birth(value):
         '((?:19|20)[0-9][0-9])-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])')
     if not reg.match(value):
         raise ValidationError(f'{value} is not valid for column date_of_birth')
+    else:
+        return True
 
 
 def validate_phone_number(value):
@@ -67,6 +76,8 @@ def validate_phone_number(value):
     reg = re.compile(r'\+?1?\d{9,15}')
     if not reg.match(value):
         raise ValidationError(f'{value} is not valid for column phone_number')
+    else:
+        return True
 
 
 def validate_blood_group(value):
