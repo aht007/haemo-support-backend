@@ -1,7 +1,7 @@
 from django.urls import path
 
-from .views import Csv_Parser_View
+from .views import CsvParserView
 
 urlpatterns = [
-    path('parse_csv/', Csv_Parser_View.as_view(), name="parse_csv"),
+    path('parse_csv/', CsvParserView.as_view(), name="parse_csv"),
 ]
