@@ -99,12 +99,6 @@ class CsvParser:
         self.file = file
         self.error_messages = []
 
-    def add_errors_to_error_list(self, errors):
-        """
-        Add errors list to error_messages list
-        """
-        self.error_messages.extend(errors)
-
     def check_file_has_content(self, file_reader):
         """
         Check if file has content or not
@@ -124,7 +118,7 @@ class CsvParser:
             if field not in file_reader.fieldnames:
                 header_errors.append(f"Missing column: {field}")
         if len(header_errors) > 0:
-            self.add_errors_to_error_list(header_errors)
+            self.error_messages.extend(header_errors)
             return False
         return True
 
@@ -132,10 +126,9 @@ class CsvParser:
         """
         Validate the given file for presence of content and headers
         """
-        file_has_content = self.check_file_has_content(file_reader)
-        if file_has_content is True:
-            return self.validate_headers(file_reader)
-        return False
+        if not self.check_file_has_content(file_reader):
+            return False
+        return self.validate_headers(file_reader)
 
     # pylint: disable=inconsistent-return-statements
 
@@ -147,14 +140,14 @@ class CsvParser:
         reader = csv.DictReader(decode_utf8(self.file))
 
         if self.validate_file(reader):
-            row_parser = RowParser()
             for index, row in enumerate(reader):
-                is_valid = row_parser.validate_row(index, row)
+                row_parser = RowParser(row, index)
+                is_valid = row_parser.validate_row()
                 if is_valid:
                     data_list.append(row)
                 else:
                     errors_list = row_parser.row_errors
-                    self.add_errors_to_error_list(errors_list)
+                    self.error_messages.extend(errors_list)
         return data_list
 
 
@@ -164,10 +157,12 @@ class RowParser:
     Rows are based on User Model
     """
 
-    def __init__(self):
+    def __init__(self, row, index):
+        self.row = row
+        self.index = index
         self.row_errors = []
 
-    def validate_column(self, validator_method, index, col):
+    def validate_column(self, validator_method, col):
         """
         validates an individual column with the validator method passed
         returns true or add error message to the list
@@ -175,25 +170,22 @@ class RowParser:
         try:
             validator_method(col)
         except ValidationError as exc:
-            self.row_errors.append(f"Row Index {index+1}: " + exc.message)
+            self.row_errors.append(f"Row Index {self.index+1}: " + exc.message)
 
-    def validate_row(self, index, row):
+    def validate_row(self):
         """
         Return true if all columns of a row have valid data, false otherwise
         """
-        self.row_errors.clear()
         self.validate_column(
-            validate_username, index, row['username'])
+            validate_username, self.row['username'])
         self.validate_column(
-            validate_email, index, row['email'])
+            validate_email, self.row['email'])
         self.validate_column(
-            validate_password, index, row['password'])
+            validate_password, self.row['password'])
         self.validate_column(
-            validate_date_of_birth, index, row['date_of_birth'])
+            validate_date_of_birth, self.row['date_of_birth'])
         self.validate_column(
-            validate_phone_number, index, row['phone_number'])
+            validate_phone_number, self.row['phone_number'])
         self.validate_column(
-            validate_blood_group, index, row['blood_group'])
-        if len(self.row_errors) > 0:
-            return False
-        return True
+            validate_blood_group, self.row['blood_group'])
+        return len(self.row_errors) == 0
