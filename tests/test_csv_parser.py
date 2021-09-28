@@ -1,10 +1,9 @@
 """
 Tests for csv parser service
 """
+import pytest
 from django.core.exceptions import ValidationError
 from csvparser import services
-
-import pytest
 
 
 def read_csv_file(file_path):
@@ -36,23 +35,6 @@ def test_invalid_username():
     username = "ab123"
     with pytest.raises(ValidationError):
         services.validate_username(username)
-
-
-def test_valid_password():
-    """
-    Excpects the return value to be true for a valid password given to service
-    """
-    password = "Pytestsis$pecial007"
-    assert services.validate_password(password) is True
-
-
-def test_invalid_password():
-    """
-    Given a wrong password value serivce raises and exception
-    """
-    password = "ab123"
-    with pytest.raises(ValidationError):
-        services.validate_password(password)
 
 
 def test_valid_email():

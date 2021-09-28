@@ -7,8 +7,8 @@ import re
 
 from django.core.exceptions import ValidationError
 
-required_columns = ['username', 'email', 'password',
-                    'date_of_birth', 'phone_number', 'blood_group']
+required_columns = ['username', 'email', 'date_of_birth',
+                    'phone_number', 'blood_group']
 blood_group_types = ['A+', 'B+', 'O+', 'AB+', 'AB-', 'O-', 'B-', 'A-']
 
 
@@ -42,17 +42,6 @@ def validate_email(value):
         '[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})')
     if not reg.match(value):
         raise ValidationError(f'{value} is not valid for column email')
-    else:
-        return True
-
-
-def validate_password(value):
-    """
-    Validates password column using regex
-    """
-    reg = re.compile(r'(?=.*[a-z])(?=.*[A-Z])[A-Za-z\d@$!#%*?&]{8,18}')
-    if not reg.match(value):
-        raise ValidationError(f'{value} is not valid for column password')
     else:
         return True
 
@@ -180,8 +169,6 @@ class RowParser:
             validate_username, self.row['username'])
         self.validate_column(
             validate_email, self.row['email'])
-        self.validate_column(
-            validate_password, self.row['password'])
         self.validate_column(
             validate_date_of_birth, self.row['date_of_birth'])
         self.validate_column(

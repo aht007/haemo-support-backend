@@ -1,17 +1,16 @@
 """
 Views for CSV Parsing functionality
 """
-from rest_framework import generics
-from rest_framework.decorators import (authentication_classes,
-                                       permission_classes)
+from rest_framework import generics, permissions
+from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
 from rest_framework import status
+
 
 from .services import CsvParser
 
 
-@authentication_classes([])
-@permission_classes([])
+@permission_classes([permissions.IsAdminUser])
 class CsvParserView(generics.GenericAPIView):
     """
     Views for Csv Parsing
@@ -34,5 +33,6 @@ class CsvParserView(generics.GenericAPIView):
             )
         else:
             return Response(
-                {}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "You need to upload a CSV file"},
+                status=status.HTTP_400_BAD_REQUEST
             )
