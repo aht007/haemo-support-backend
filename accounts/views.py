@@ -1,7 +1,9 @@
 """
 Views for Accounts App
 """
-
+from django.views import generic
+from accounts.services import MailService
+from django import utils
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 
@@ -109,14 +111,41 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 
 @permission_classes([permissions.IsAdminUser])
-class BulkUserCreationView(generics.CreateAPIView):
+class BulkUserCreationView(generics.GenericAPIView):
     """
     View for Bulk User Registration
     """
     serializer_class = BulkRegisterSerializer
 
-    def get_serializer(self, *args, **kwargs):
-        if isinstance(kwargs.get("data", {}), list):
-            kwargs["many"] = True
+    def send_password_creation_mail_to_users(self, request, users):
+        """
+        Utility function to send mail to userX
+        """
+        for user in users:
+            MailService.send_email_for_password_creation(request, user)
 
-        return super().get_serializer(*args, **kwargs)
+    def post(self, request):
+        """
+        Post action for bulk user creation
+        """
+        serializer = self.get_serializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+        users = serializer.save()
+        self.send_password_creation_mail_to_users(request, users)
+        return Response(
+            serializer.data
+        )
+
+
+@permission_classes([])
+@authentication_classes([])
+class SetPasswordView(generics.GenericAPIView):
+    """
+    View for checking the token validity and setting new password functionality
+    """
+
+    def get(self, request, uidb64, token):
+        """
+        Method for checkiung token validity
+        """
+        return Response({})
