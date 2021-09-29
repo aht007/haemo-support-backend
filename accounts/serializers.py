@@ -83,3 +83,29 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['user'] = user.username
         token['date'] = str(datetime.date.today())
         return token
+
+
+class BulkRegisterSerializer(serializers.ModelSerializer):
+    """
+    Serailizer for registering bulk user accounts
+    """
+    class Meta:
+        """
+        Initializing the serializer with proper data
+        """
+        model = User
+        fields = ('id', 'username', 'email', 'date_of_birth',
+                  'phone_number', 'blood_group')
+
+    def create(self, validated_data):
+        """
+        Overriding the create method to attach custom fields
+        """
+        blood_group = validated_data.get('blood_group', None)
+        password = User.objects.make_random_password()
+        user = User.objects.create_user(
+            validated_data['username'], validated_data['email'],
+            validated_data['date_of_birth'], validated_data['phone_number'],
+            blood_group, password
+        )
+        return user

@@ -11,7 +11,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
 )
 from accounts.models import User
-from .serializers import (MyTokenObtainPairSerializer, UserSerializer,
+from .serializers import (BulkRegisterSerializer, MyTokenObtainPairSerializer, UserSerializer,
                           RegisterSerializer, LoginSerializer)
 
 
@@ -106,3 +106,16 @@ class MyTokenObtainPairView(TokenObtainPairView):
     View for getting JWT Token
     """
     serializer_class = MyTokenObtainPairSerializer
+
+
+class BulkUserCreationView(generics.CreateAPIView):
+    """
+    View for Bulk User Registration
+    """
+    serializer_class = BulkRegisterSerializer
+
+    def get_serializer(self, *args, **kwargs):
+        if isinstance(kwargs.get("data", {}), list):
+            kwargs["many"] = True
+
+        return super().get_serializer(*args, **kwargs)
