@@ -11,8 +11,8 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
 )
 from accounts.models import User
-from .serializers import (BulkRegisterSerializer, MyTokenObtainPairSerializer, UserSerializer,
-                          RegisterSerializer, LoginSerializer)
+from .serializers import (BulkRegisterSerializer, MyTokenObtainPairSerializer,
+                          UserSerializer, RegisterSerializer, LoginSerializer)
 
 
 @authentication_classes([])
@@ -108,6 +108,7 @@ class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
 
+@permission_classes([permissions.IsAdminUser])
 class BulkUserCreationView(generics.CreateAPIView):
     """
     View for Bulk User Registration
