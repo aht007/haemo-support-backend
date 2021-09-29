@@ -106,10 +106,8 @@ class CsvParser:
         for field in required_columns:
             if field not in file_reader.fieldnames:
                 header_errors.append(f"Missing column: {field}")
-        if len(header_errors) > 0:
-            self.error_messages.extend(header_errors)
-            return False
-        return True
+        self.error_messages.extend(header_errors)
+        return len(header_errors) == 0
 
     def validate_file(self, file_reader):
         """
