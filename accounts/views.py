@@ -1,9 +1,7 @@
 """
 Views for Accounts App
 """
-from django.views import generic
-from accounts.services import MailService
-from django import utils
+
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 
@@ -13,6 +11,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
 )
 from accounts.models import User
+from accounts.services import MailService
 from .serializers import (BulkRegisterSerializer, MyTokenObtainPairSerializer,
                           UserSerializer, RegisterSerializer, LoginSerializer)
 
