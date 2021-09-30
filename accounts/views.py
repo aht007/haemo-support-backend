@@ -4,7 +4,7 @@ Views for Accounts App
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_text
 
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -13,7 +13,6 @@ from rest_framework.decorators import (authentication_classes,
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
 )
-from rest_framework import status
 
 from accounts.models import User
 from accounts.services import MailService
