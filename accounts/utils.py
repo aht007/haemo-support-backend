@@ -11,8 +11,12 @@ class PasswordResetToken(PasswordResetTokenGenerator):
     """
 
     def _make_hash_value(self, user, timestamp):
+        """
+        Adding password value as hash to invalidate the token once
+        password is set
+        """
         return (
-            str(user.pk) + str(timestamp)
+            str(user.pk) + str(timestamp) + str(user.password)
         )
 
 

@@ -30,6 +30,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+PASSWORD_RESET_TIMEOUT_DAYS = 1
+
 AUTH_USER_MODEL = "accounts.User"
 
 ASGI_APPLICATION = "haemosupport.routing.application"
@@ -52,7 +54,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework_simplejwt.token_blacklist',
     'channels',
     'corsheaders',
     'django_filters',

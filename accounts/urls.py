@@ -21,5 +21,5 @@ urlpatterns = [
     path('auth/user/<int:pk>/', UserEditView.as_view(), name="edit_user"),
     path('auth/bulk-create-users/',
          BulkUserCreationView.as_view(), name='bulk_create_users'),
-    path('auth/set-password', SetPasswordView.as_view(), name='set-password')
+    path('auth/set-password/', SetPasswordView.as_view(), name='set-password')
 ]

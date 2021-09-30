@@ -1,19 +1,25 @@
 """
 Views for Accounts App
 """
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_text
 
 from rest_framework import generics, permissions
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from rest_framework.decorators import (authentication_classes,
                                        permission_classes)
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
 )
+from rest_framework import status
+
 from accounts.models import User
 from accounts.services import MailService
 from .serializers import (BulkRegisterSerializer, MyTokenObtainPairSerializer,
                           UserSerializer, RegisterSerializer, LoginSerializer)
+from .utils import password_reset_token
 
 
 @authentication_classes([])
@@ -138,13 +144,70 @@ class BulkUserCreationView(generics.GenericAPIView):
 
 @permission_classes([])
 @authentication_classes([])
-class SetPasswordView(generics.GenericAPIView):
+class SetPasswordView(APIView):
     """
     View for checking the token validity and setting new password functionality
     """
 
-    def get(self, request, uidb64, token):
+    def get_user(self, uidb64):
+        """
+        function to return user from given base 64 encoded user id
+        """
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+        return user
+
+    def check_token_validity(self, user, token):
+        """
+        function to check given token's validity... returns boolean as result
+        """
+        return password_reset_token.check_token(user, token)
+
+    def get(self, request):
         """
         Method for checkiung token validity
         """
-        return Response({})
+        try:
+            user = self.get_user(request.GET.get('uidb64'))
+            is_token_valid = self.check_token_validity(
+                user, request.GET.get('token'))
+            if(user is not None and is_token_valid):
+                return Response({
+                    "data": "Token is valid and not expired"
+                })
+            else:
+                return Response({
+                    "data": "Token is invalid"},
+                    status=status.HTTP_403_FORBIDDEN)
+
+        except (TypeError, ValueError, OverflowError,
+                User.DoesNotExist) as exc:
+            return Response({"error": str(exc)},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request):
+        """
+        Post method for validating uid and token and
+        then creating password for user
+        """
+        try:
+            uidb64 = request.data.get('uidb64')
+            token = request.data.get('token')
+            user = self.get_user(uidb64)
+            is_token_valid = self.check_token_validity(
+                user, token)
+            if(user is not None and is_token_valid):
+                user.set_password(request.data.get('password'))
+                user.save()
+                return Response({
+                    "data": "Password Changed Successfully"
+                })
+            else:
+                return Response({
+                    "data": "Token is invalid"},
+                    status=status.HTTP_403_FORBIDDEN)
+
+        except (TypeError, ValueError, OverflowError,
+                User.DoesNotExist) as exc:
+            return Response({"error": str(exc)},
+                            status=status.HTTP_400_BAD_REQUEST)
