@@ -6,10 +6,9 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 from haemosupport.settings import DEFAULT_FROM_EMAIL
-
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 
 def send_mail_to_new_users(user_list, domain):
