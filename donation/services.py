@@ -56,6 +56,10 @@ class MailService:
                   fail_silently=False
                   )
 
+    def send_pending_donation_requests_alert():
+
+        pass
+
 
 class SmsService:
     """
