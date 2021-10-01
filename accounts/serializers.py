@@ -10,7 +10,31 @@ from rest_framework import serializers
 from .models import User
 
 
-class UserSerializer(serializers.ModelSerializer):
+class BaseSerializer(serializers.ModelSerializer):
+    """
+    Base User Serializer
+    """
+    class Meta:
+        """
+        Initializing the serializer with proper data
+        """
+        model = User
+        fields = ['id', 'username', 'email', 'date_of_birth',
+                  'phone_number', 'blood_group']
+
+    def create(self, validated_data):
+        """
+        Overriding the create method to attach custom fields
+        """
+        password = User.objects.make_random_password()
+        user = User.objects.create_user(
+            **validated_data,
+            password=password
+        )
+        return user
+
+
+class UserSerializer(BaseSerializer):
     """
     Serializer for getting Complete User Data at frotnend
     """
@@ -19,11 +43,10 @@ class UserSerializer(serializers.ModelSerializer):
         Initializing the serializer with proper data
         """
         model = User
-        fields = ('id', 'username', 'email', 'date_of_birth',
-                  'phone_number', 'blood_group', 'is_admin')
+        fields = BaseSerializer.Meta.fields+['is_admin']
 
 
-class RegisterSerializer(serializers.ModelSerializer):
+class RegisterSerializer(BaseSerializer):
     """
     Serailizer for registering an account
     """
@@ -32,20 +55,15 @@ class RegisterSerializer(serializers.ModelSerializer):
         Initializing the serializer with proper data
         """
         model = User
-        fields = ('id', 'username', 'email', 'password',
-                  'date_of_birth', 'phone_number', 'blood_group', 'is_admin')
+        fields = BaseSerializer.Meta.fields+['is_admin', 'password']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         """
         Overriding the create method to attach custom fields
         """
-        blood_group = validated_data.get('blood_group', None)
-        is_admin = validated_data.get('is_admin', "0")
         user = User.objects.create_user(
-            validated_data['username'], validated_data['email'],
-            validated_data['date_of_birth'], validated_data['phone_number'],
-            blood_group, validated_data['password'], is_admin
+            **validated_data,
         )
         return user
 
@@ -83,29 +101,3 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['user'] = user.username
         token['date'] = str(datetime.date.today())
         return token
-
-
-class BulkRegisterSerializer(serializers.ModelSerializer):
-    """
-    Serailizer for registering bulk user accounts
-    """
-    class Meta:
-        """
-        Initializing the serializer with proper data
-        """
-        model = User
-        fields = ('id', 'username', 'email', 'date_of_birth',
-                  'phone_number', 'blood_group')
-
-    def create(self, validated_data):
-        """
-        Overriding the create method to attach custom fields
-        """
-        blood_group = validated_data.get('blood_group', None)
-        password = User.objects.make_random_password()
-        user = User.objects.create_user(
-            validated_data['username'], validated_data['email'],
-            validated_data['date_of_birth'], validated_data['phone_number'],
-            blood_group, password
-        )
-        return user

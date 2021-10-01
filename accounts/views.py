@@ -1,8 +1,10 @@
 """
 Views for Accounts App
 """
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_text
+from django.contrib.sites.shortcuts import get_current_site
 
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
@@ -15,10 +17,9 @@ from rest_framework_simplejwt.views import (
 )
 
 from accounts.models import User
-from accounts.services import MailService
-from .serializers import (BulkRegisterSerializer, MyTokenObtainPairSerializer,
+from .serializers import (BaseSerializer, MyTokenObtainPairSerializer,
                           UserSerializer, RegisterSerializer, LoginSerializer)
-from .utils import password_reset_token
+from .services import send_mail_to_new_users
 
 
 @authentication_classes([])
@@ -119,14 +120,14 @@ class BulkUserCreationView(generics.GenericAPIView):
     """
     View for Bulk User Registration
     """
-    serializer_class = BulkRegisterSerializer
+    serializer_class = BaseSerializer
 
     def send_password_creation_mail_to_users(self, request, users):
         """
-        Utility function to send mail to userX
+        Utility function to send mail to users
         """
-        for user in users:
-            MailService.send_email_for_password_creation(request, user)
+        domain = get_current_site(request)
+        send_mail_to_new_users(users, domain)
 
     def post(self, request):
         """
@@ -160,7 +161,8 @@ class SetPasswordView(APIView):
         """
         function to check given token's validity... returns boolean as result
         """
-        return password_reset_token.check_token(user, token)
+        token_generator = PasswordResetTokenGenerator()
+        return token_generator.check_token(user, token)
 
     def get(self, request):
         """

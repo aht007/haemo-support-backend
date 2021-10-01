@@ -10,6 +10,12 @@ from django.core.exceptions import ValidationError
 required_columns = ['username', 'email', 'date_of_birth',
                     'phone_number', 'blood_group']
 blood_group_types = ['A+', 'B+', 'O+', 'AB+', 'AB-', 'O-', 'B-', 'A-']
+user_name_regex_pattern = "[A-Za-z][A-Za-z0-9_]{7,29}"
+email_regex_pattern = ("(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-]"
+                       "[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})")
+date_of_birth_regex_pattern = ("((?:19|20)[0-9][0-9])-(0?[1-9]|1[012])"
+                               "-(0?[1-9]|[12][0-9]|3[01])")
+phone_number_regex_pattern = r"\+?1?\d{9,15}"
 
 
 def decode_utf8(input_iterator):
@@ -25,9 +31,7 @@ def validate_username(value):
     """
     Validates username column using regex
     """
-    reg = re.compile(
-        r'[A-Za-z][A-Za-z0-9_]{7,29}')
-    if not reg.match(value):
+    if not re.match(user_name_regex_pattern, value):
         raise ValidationError(f'{value} is not valid for column username')
     else:
         return True
@@ -37,10 +41,7 @@ def validate_email(value):
     """
     Validates email column using regex
     """
-    reg = re.compile(
-        r'(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.'
-        '[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})')
-    if not reg.match(value):
+    if not re.match(email_regex_pattern, value):
         raise ValidationError(f'{value} is not valid for column email')
     else:
         return True
@@ -50,9 +51,7 @@ def validate_date_of_birth(value):
     """
     Validates Date of birth column using regex
     """
-    reg = re.compile(
-        '((?:19|20)[0-9][0-9])-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])')
-    if not reg.match(value):
+    if not re.match(date_of_birth_regex_pattern, value):
         raise ValidationError(f'{value} is not valid for column date_of_birth')
     else:
         return True
@@ -62,8 +61,7 @@ def validate_phone_number(value):
     """
     Validates phone number column using regex
     """
-    reg = re.compile(r'\+?1?\d{9,15}')
-    if not reg.match(value):
+    if not re.match(phone_number_regex_pattern, value):
         raise ValidationError(f'{value} is not valid for column phone_number')
     else:
         return True
@@ -73,10 +71,10 @@ def validate_blood_group(value):
     """
     Validates Blood grouo column
     """
-    if value in blood_group_types:
-        return True
-    else:
+    if value not in blood_group_types:
         raise ValidationError(f'{value} is not valid for column blood_group')
+    else:
+        return True
 
 
 class CsvParser:
