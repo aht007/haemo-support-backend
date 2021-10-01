@@ -22,7 +22,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('accounts.urls')),
     path('', include('healthprofile.urls')),
-    path('', include('donation.urls'))
+    path('', include('donation.urls')),
+    path('', include('csvparser.urls'))
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,

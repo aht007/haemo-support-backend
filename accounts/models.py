@@ -2,7 +2,8 @@
 Models for Accounts App
 """
 
-
+from django.db.models import signals
+from django.dispatch import receiver
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.validators import RegexValidator

@@ -1,29 +1,28 @@
 """
-Middleware for attaching user to socket request through token
+Channels Middleware Class
 """
+from urllib.parse import parse_qs
 from django.contrib.auth.models import AnonymousUser
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
+from channels.auth import AuthMiddlewareStack
+from channels.db import database_sync_to_async
 from rest_framework_simplejwt.tokens import UntypedToken
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
-
 from jwt import decode as jwt_decode
-
-from channels.middleware import BaseMiddleware
-from channels.db import database_sync_to_async
 
 
 @database_sync_to_async
 def get_user(headers):
     """
-    Extract user from token
+    Gets user from token
     """
     try:
         UntypedToken(headers)
-    except (InvalidToken, TokenError) as err:
+    except (InvalidToken, TokenError) as e:
         # Token is invalid
-        print(err)
+        print(e)
         return AnonymousUser
     else:
         #  Then token is valid, decode it
@@ -34,25 +33,30 @@ def get_user(headers):
         return user
 
 
-class TokenAuthMiddleware(BaseMiddleware):
+class TokenAuthMiddleware:
     """
-    Middleware Class
+    Middlware class to override default middleware
     """
 
     def __init__(self, inner):
         """
-        Initialize Instance properly
+        Initialize appropriate data
         """
-        super().__init__(inner)
+        self.inner = inner
 
     async def __call__(self, scope, receive, send):
         """
-        Get token and attach user to request
+        Attach user to socket request scope
         """
-        try:
-            token_key = (dict((x.split('=') for x in scope['query_string']
-                               .decode().split("&")))).get('token', None)
-        except ValueError:
-            token_key = None
-        scope['user'] = get_user(token_key)
-        return await super().__call__(scope, receive, send)
+        headers = parse_qs(scope["query_string"].decode("utf8"))["token"][0]
+        scope['user'] = await get_user(headers)
+        return await self.inner(scope, receive, send)
+
+
+def TokenAuthMiddlewareStack(inner):
+    """
+    Add our middleware to middlwares stack
+    """
+    return TokenAuthMiddleware(
+        AuthMiddlewareStack(inner)
+    )
