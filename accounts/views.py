@@ -19,7 +19,7 @@ from rest_framework_simplejwt.views import (
 from accounts.models import User
 from .serializers import (BaseSerializer, MyTokenObtainPairSerializer,
                           UserSerializer, RegisterSerializer, LoginSerializer)
-from .services import send_mail_to_new_users
+from .tasks import send_email_for_password_creation
 
 
 @authentication_classes([])
@@ -126,8 +126,10 @@ class BulkUserCreationView(generics.GenericAPIView):
         """
         Utility function to send mail to users
         """
-        domain = get_current_site(request)
-        send_mail_to_new_users(users, domain)
+        domain = get_current_site(request).domain
+        user_ids = [user.id for user in users]
+        data = {"user_ids": user_ids, "domain": domain}
+        send_email_for_password_creation.delay(data)
 
     def post(self, request):
         """
