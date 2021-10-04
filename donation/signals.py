@@ -10,7 +10,7 @@ from django.dispatch import receiver
 from asgiref.sync import async_to_sync
 import channels.layers
 
-from donation.services import MailService, SmsService
+from donation.services import send_email_to_donor, send_email_to_requestor, send_sms
 from donation.serializers import DonationUserSerializer
 from donation.models import DonationRequest, Status
 
@@ -46,16 +46,16 @@ def donation_request_approve_observer(sender, instance, created, **kwargs):
         if instance.status == Status.IN_PROGRESS:
             try:
 
-                MailService.send_email_to_donor(
+                send_email_to_donor(
                     instance)
 
-                MailService.send_email_to_requestor(
+                send_email_to_requestor(
                     instance)
                 body = format_donor_data_for_message(instance)
-                SmsService.send_sms(
+                send_sms(
                     body, instance.donor.phone_number, +12248084101)
                 body = format_requestor_data_for_message(instance)
-                SmsService.send_sms(
+                send_sms(
                     body, instance.created_by.phone_number, +12248084101)
 
             except requests.HTTPError as exception:
