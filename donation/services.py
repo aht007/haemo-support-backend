@@ -8,11 +8,11 @@ from django.utils.html import strip_tags
 from twilio.rest import Client
 import twilio
 
-from accounts.models import User
-from .models import DonationRequest, Status
 from haemosupport.settings import (
     DEFAULT_FROM_EMAIL,
     TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+from accounts.models import User
+from .models import DonationRequest, Status
 
 
 class MailService:
