@@ -1,11 +1,9 @@
-from celery.decorators import periodic_task
-from celery.task.schedules import crontab
+from celery import shared_task
 
 from .services import MailService
 
 
-@periodic_task(run_every=(crontab(minute='*/15')),
-               name="send_pending_donations_alert", ignore_result=True)
+@shared_task
 def send_pending_donations_alert():
     """
     Sends email alerts to admins for pending donation requests

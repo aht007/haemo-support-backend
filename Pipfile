@@ -17,6 +17,7 @@ twilio = "==6.4.0"
 awsebcli = "*"
 celery = "*"
 redis = "*"
+flower = "*"
 
 [dev-packages]
 pytest = "*"

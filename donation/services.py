@@ -63,22 +63,54 @@ class MailService:
         """
         Send donation reminder alerts to admins
         """
-        admin_users = User.objects.get(is_admin=True)
-        pending_doantion_requests = DonationRequest.objects.get(
-            status=Status.PENDING)
+        admin_users = User.objects.filter(is_admin=True)
+        pending_requests_count = DonationRequest.objects.filter(
+            status=Status.PENDING).count()
         for admin in admin_users:
-            pass
+            recepient_email = admin.email
+            subject = "Reminder"
+            sender = DEFAULT_FROM_EMAIL
+            html_content = render_to_string(
+                'donation/admin_reminder.html', {
+                    "username": admin.username,
+                    "requests_count": pending_requests_count
+                })
+            plain_text = strip_tags(html_content)
+            send_mail(subject, plain_text,
+                      sender,
+                      [
+                          recepient_email,
+                      ],
+                      html_message=html_content,
+                      fail_silently=False
+                      )
 
     @staticmethod
     def send_pending_donations_reminder_to_users():
         """
         Send donation reminder alerts to users
         """
-        users = User.objects.get(is_admin=False)
-        pending_doantion_requests = DonationRequest.objects.get(
+        users = User.objects.filter(is_admin=False)
+        pending_requests = DonationRequest.objects.filter(
             status=Status.APPROVED)
         for user in users:
-            pass
+            recepient_email = user.email
+            subject = "Reminder"
+            sender = DEFAULT_FROM_EMAIL
+            html_content = render_to_string(
+                'donation/user_reminder.html', {
+                    "username": user.username,
+                    "pending_requests": pending_requests
+                })
+            plain_text = strip_tags(html_content)
+            send_mail(subject, plain_text,
+                      sender,
+                      [
+                          recepient_email,
+                      ],
+                      html_message=html_content,
+                      fail_silently=False
+                      )
 
     @staticmethod
     def send_pending_donation_requests_alert():
