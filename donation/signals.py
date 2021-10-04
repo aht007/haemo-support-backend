@@ -10,7 +10,8 @@ from django.dispatch import receiver
 from asgiref.sync import async_to_sync
 import channels.layers
 
-from donation.services import send_email_to_donor, send_email_to_requestor, send_sms
+from donation.services import (send_email_to_donor, send_email_to_requestor,
+                               send_sms)
 from donation.serializers import DonationUserSerializer
 from donation.models import DonationRequest, Status
 
