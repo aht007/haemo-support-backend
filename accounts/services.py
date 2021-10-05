@@ -7,16 +7,18 @@ from django.utils.html import strip_tags
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from accounts.models import User
 
 from haemosupport.settings import DEFAULT_FROM_EMAIL
 
 
-def send_mail_to_new_users(user_list, domain):
+def send_mail_to_new_users(data):
     """
     Function to iterate over user list and send mail
     """
-    for user in user_list:
-        send_email_for_password_creation(user, domain)
+    for uid in data['user_ids']:
+        user = User.objects.get(pk=uid)
+        send_email_for_password_creation(user, data['domain'])
 
 
 def send_email_for_password_creation(user, domain):

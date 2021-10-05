@@ -115,8 +115,6 @@ class CsvParser:
             return False
         return self.validate_headers(file_reader)
 
-    # pylint: disable=inconsistent-return-statements
-
     def parse_file(self):
         """
         Create a CSV reader Parse the File

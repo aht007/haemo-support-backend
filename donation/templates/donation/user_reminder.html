@@ -1,0 +1,27 @@
+{% extends "donation/base.html" %} {% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col text-center">Hello: {{username}}</div>
+  </div>
+  <div class="row">
+    <div class="col text-danger">
+      <pre>
+      Pending Donation Requests that need your Attention:
+            {% for request in pending_requests %}
+                Blood Group: {{request.blood_group}}
+                Quantity: {{request.quantity}}
+                Location: {{request.location}}
+                Priority: {{request.priority}}
+
+            {% empty %}
+                There are no Pending Requests.
+            {% endfor %}
+            Please get in touch as soon as possible
+            🩸🩸🩸Donate Blood... Save Lifes....🩸🩸🩸
+        </pre
+      >
+    </div>
+  </div>
+</div>
+{% endblock %}
