@@ -15,7 +15,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04]
         python-version: ["3.9"]
-        toxenv: [django31, django32, quality, celery50]
+        toxenv: [django31, django32, quality]
 
     steps:
       - uses: actions/checkout@v1
