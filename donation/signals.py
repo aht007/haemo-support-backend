@@ -81,6 +81,8 @@ def format_donor_data_for_message(instance):
     """
     requestor_name = instance.created_by.username
     phone_number = instance.created_by.phone_number
-    body = f"Requestor {requestor_name} having Phone Number{phone_number} "
-    "awaits a call from you"
+    date_required = instance.date_required
+    body = (
+        f"Requestor {requestor_name} having Phone Number{phone_number} "
+        f"awaits a call from. Donation Request is Due on {date_required}")
     return body

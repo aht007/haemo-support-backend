@@ -2,7 +2,7 @@
 Models for Donation App
 """
 from django.db import models
-from django.utils import timezone
+from datetime import date
 from accounts.models import BloodGroupTypes
 
 
@@ -34,7 +34,7 @@ class DonationRequest(models.Model):
         max_length=3, choices=BloodGroupTypes.choices)
     quantity = models.IntegerField(default=0)
     location = models.CharField(max_length=200)
-    time = models.DateTimeField(default=timezone.now, db_index=True)
+    date_required = models.DateField(default=date.today, db_index=True)
     created_by = models.ForeignKey(
         'accounts.User', related_name='donation_requests',
         on_delete=models.CASCADE)

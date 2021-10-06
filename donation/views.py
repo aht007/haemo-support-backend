@@ -38,7 +38,7 @@ class DonationView(generics.ListCreateAPIView):
     parser_classes = [parsers.MultiPartParser, parsers.FormParser]
     filterset_fields = ['search_slug']
     serializer_class = DonationUserSerializer
-    ordering = ['time']
+    ordering = ['date_required']
     ordering_fields = ['priority']
 
     def get_queryset(self):
@@ -54,7 +54,7 @@ class DonationView(generics.ListCreateAPIView):
             queryset = DonationRequest.objects.filter(
                 ~Q(created_by=self.request.user) &
                 Q(status=Status.APPROVED)
-            ).order_by('-time')
+            ).order_by('-date_required')
         return queryset
 
 

@@ -14,7 +14,7 @@ class BaseSerializer(serializers.ModelSerializer):
         Initializing the base serializer with appropriate Config
         """
         model = DonationRequest
-        fields = ['id', 'comments', 'status']
+        fields = ['id', 'comments', 'status', 'date_required']
 
 
 class DonationUserSerializer(BaseSerializer):
