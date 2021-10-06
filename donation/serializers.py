@@ -93,3 +93,18 @@ class BloodDonateActionSerializer(serializers.ModelSerializer):
             instance.donor = self.context['request'].user
         instance.save()
         return instance
+
+
+class AwaitedDonationSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Awaited Donation Requests
+    """
+    donor_name = serializers.CharField(source='donor.username', default='')
+
+    class Meta:
+        """
+        Initializing the serializer with appropriate Config
+        """
+        model = DonationRequest
+        fields = ['id', 'blood_group', 'priority', 'location',
+                  'donor_name', ]

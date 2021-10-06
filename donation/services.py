@@ -129,3 +129,23 @@ def send_sms(body, to_number, from_number):
         )
     except twilio.base.exceptions.TwilioRestException as exception:
         print(exception)
+
+
+def send_awaited_request_notification(donation_request):
+    """
+    Sends alert for donation request that is due soon
+    """
+    sender = DEFAULT_FROM_EMAIL
+    html_content = render_to_string(
+        'donation/donor_reminder.html', {
+            "request": donation_request
+        })
+    plain_text = strip_tags(html_content)
+    send_mail("Donation Due Soon", plain_text,
+              sender,
+              [
+                  donation_request.donor.email,
+              ],
+              html_message=html_content,
+              fail_silently=False
+              )

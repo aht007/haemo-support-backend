@@ -69,9 +69,10 @@ def format_requestor_data_for_message(instance):
     """
     donor_name = instance.donor.username
     phone_number = instance.donor.phone_number
-    body = f"Donor {donor_name} having Phone Number{phone_number} has"
-    " accepted your request and will be"
-    " in contact with you soon"
+    body = (
+        f"Donor {donor_name} having Phone Number{phone_number} has"
+        " accepted your request and will be"
+        " in contact with you soon")
     return body
 
 

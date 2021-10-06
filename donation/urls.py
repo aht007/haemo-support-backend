@@ -2,10 +2,15 @@
 Urls for Donation App
 """
 from django.urls import path
+from rest_framework import routers
+
 from .views import (DonationAdminActionsView,
                     DonationView, UserRequestsView,
                     DonationUpdateDestoryView,
-                    BloodDonateActionView)
+                    BloodDonateActionView, AwaitedDonationsViewSet)
+
+router = routers.DefaultRouter()
+router.register(r'awaited-donations', AwaitedDonationsViewSet, 'donations')
 
 urlpatterns = [
     path('donations/', DonationView.as_view(),
@@ -21,3 +26,5 @@ urlpatterns = [
     path('donations/<int:pk>/donate/',
          BloodDonateActionView.as_view(), name="donate_on_request")
 ]
+
+urlpatterns += router.urls

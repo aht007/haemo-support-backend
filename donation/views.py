@@ -1,15 +1,22 @@
 """
 Views for Donation App
 """
+import datetime
+import smtplib
 from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 
-from rest_framework import generics, permissions, parsers, filters
+from rest_framework import (generics, permissions, parsers,
+                            filters, viewsets, status)
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework.decorators import action
 
-from donation.serializers import (BaseSerializer, BloodDonateActionSerializer,
+from donation.serializers import (AwaitedDonationSerializer, BaseSerializer,
+                                  BloodDonateActionSerializer,
                                   DonationUserSerializer)
 from donation.models import DonationRequest, Status
+from donation.services import send_awaited_request_notification
 
 
 class IsUserAuthorized(permissions.BasePermission):
@@ -100,3 +107,38 @@ class BloodDonateActionView(generics.UpdateAPIView):
     """
     serializer_class = BloodDonateActionSerializer
     queryset = DonationRequest.objects.all()
+
+
+class AwaitedDonationsViewSet(viewsets.ModelViewSet):
+    """
+    View set for listing soon due donation requests
+    and sending alerts
+    """
+    permission_classes = [permissions.IsAdminUser]
+    queryset = DonationRequest.objects.all()
+
+    def list(self, request):
+        """
+        List soon due donation requests
+        """
+        date_tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+        queryset = DonationRequest.objects.filter(
+            Q(date_required=date_tomorrow) & Q(status=Status.IN_PROGRESS))
+        serializer = AwaitedDonationSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True)
+    def notify_donor(self, request, pk=None):
+        """
+        Notifies User about Soon due pending request
+        """
+        try:
+            donation_request = self.get_object()
+            send_awaited_request_notification(donation_request)
+            return Response({
+                "data": "Mail Sent Succesfully"
+            })
+        except smtplib.SMTPResponseException as e:
+            print(e)
+            return Response({"error": str(e)},
+                            status=status.HTTP_503_SERVICE_UNAVAILABLE)
