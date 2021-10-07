@@ -108,6 +108,8 @@ class BloodDonateActionView(generics.UpdateAPIView):
     serializer_class = BloodDonateActionSerializer
     queryset = DonationRequest.objects.all()
 
+# pylint: disable=too-many-ancestors
+
 
 class AwaitedDonationsViewSet(viewsets.ModelViewSet):
     """
