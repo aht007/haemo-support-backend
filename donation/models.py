@@ -1,8 +1,10 @@
 """
 Models for Donation App
 """
-from django.db import models
 from datetime import date
+
+from django.db import models
+
 from accounts.models import BloodGroupTypes
 
 
