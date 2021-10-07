@@ -16,7 +16,8 @@ from donation.serializers import (AwaitedDonationSerializer, BaseSerializer,
                                   BloodDonateActionSerializer,
                                   DonationUserSerializer)
 from donation.models import DonationRequest, Status
-from donation.services import send_awaited_request_notification
+from donation.services import (send_awaited_request_notification,
+                               send_soon_due_pending_request_notification)
 
 
 class IsUserAuthorized(permissions.BasePermission):
@@ -113,15 +114,15 @@ class BloodDonateActionView(generics.UpdateAPIView):
 
 class AwaitedDonationsViewSet(viewsets.ModelViewSet):
     """
-    View set for listing soon due donation requests
-    and sending alerts
+    Viewset for listing soon due in progress donation requests
+    and sending alerts for them
     """
     permission_classes = [permissions.IsAdminUser]
     queryset = DonationRequest.objects.all()
 
     def list(self, request):
         """
-        List soon due donation requests
+        List soon due, in_progress donation requests
         """
         date_tomorrow = datetime.date.today() + datetime.timedelta(days=1)
         queryset = DonationRequest.objects.filter(
@@ -132,13 +133,49 @@ class AwaitedDonationsViewSet(viewsets.ModelViewSet):
     @action(detail=True)
     def notify_donor(self, request, pk=None):
         """
-        Notifies User about Soon due pending request
+        Notifies User about Soon due in_progress request
         """
         try:
             donation_request = self.get_object()
             send_awaited_request_notification(donation_request)
             return Response({
                 "data": "Mail Sent Succesfully"
+            })
+        except smtplib.SMTPResponseException as e:
+            print(e)
+            return Response({"error": str(e)},
+                            status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+
+class PendingDonationsViewSet(viewsets.ModelViewSet):
+    """
+    Viewset for listing soon due pending donation requests
+    and sending alerts for them
+    """
+    permission_classes = [permissions.IsAdminUser]
+    queryset = DonationRequest.objects.all()
+
+    def list(self, request):
+        """
+        List soon due, pending donation requests
+        """
+        date_today = datetime.date.today()
+        date_tomorrow = date_today + datetime.timedelta(days=1)
+        queryset = DonationRequest.objects.filter(
+            Q(date_required__range=[date_today, date_tomorrow]) &
+            Q(status=Status.APPROVED))
+        serializer = AwaitedDonationSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False)
+    def notify_users(self, request):
+        """
+        Notifies Users about Soon due pending request
+        """
+        try:
+            send_soon_due_pending_request_notification()
+            return Response({
+                "data": "Users Notified Successfully"
             })
         except smtplib.SMTPResponseException as e:
             print(e)

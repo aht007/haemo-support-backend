@@ -7,10 +7,13 @@ from rest_framework import routers
 from .views import (DonationAdminActionsView,
                     DonationView, UserRequestsView,
                     DonationUpdateDestoryView,
-                    BloodDonateActionView, AwaitedDonationsViewSet)
+                    BloodDonateActionView, AwaitedDonationsViewSet,
+                    PendingDonationsViewSet)
 
 router = routers.DefaultRouter()
 router.register(r'awaited-donations', AwaitedDonationsViewSet, 'donations')
+router.register(r'due-soon-pending-donations',
+                PendingDonationsViewSet, 'donations')
 
 urlpatterns = [
     path('donations/', DonationView.as_view(),
