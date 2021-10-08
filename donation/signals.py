@@ -29,7 +29,7 @@ def donation_request_observer(sender, instance, created, **kwargs):
             'request': json.dumps(data)
         }
         )
-    else:
+    elif instance.status == Status.APPROVED:
         async_to_sync(layer.group_send)('user_donations', {
             'type': 'donation_request',
             'request': json.dumps(data)
