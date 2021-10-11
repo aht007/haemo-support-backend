@@ -1,9 +1,11 @@
 """
 Service for Email and Sms Notification
 """
+import datetime
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from django.db.models import Q
 
 from twilio.rest import Client
 import twilio
@@ -129,3 +131,53 @@ def send_sms(body, to_number, from_number):
         )
     except twilio.base.exceptions.TwilioRestException as exception:
         print(exception)
+
+
+def send_awaited_request_notification(donation_request):
+    """
+    Sends alert for donation request that is due soon
+    """
+    sender = DEFAULT_FROM_EMAIL
+    html_content = render_to_string(
+        'donation/donor_reminder.html', {
+            "request": donation_request
+        })
+    plain_text = strip_tags(html_content)
+    send_mail("Donation Due Soon", plain_text,
+              sender,
+              [
+                  donation_request.donor.email,
+              ],
+              html_message=html_content,
+              fail_silently=False
+              )
+
+
+def send_soon_due_pending_request_notification():
+    """
+    Sends alert for donation request that is due soon and is still pending
+    """
+    users = User.objects.filter(is_admin=False)
+    date_today = datetime.date.today()
+    date_tomorrow = date_today + datetime.timedelta(days=1)
+    pending_requests = DonationRequest.objects.filter(
+        Q(date_required__range=[date_today, date_tomorrow]) &
+        Q(status=Status.APPROVED))
+    for user in users:
+        recepient_email = user.email
+        subject = "Reminder"
+        sender = DEFAULT_FROM_EMAIL
+        html_content = render_to_string(
+            'donation/user_reminder.html', {
+                "username": user.username,
+                "pending_requests": pending_requests
+            })
+        plain_text = strip_tags(html_content)
+        send_mail(subject, plain_text,
+                  sender,
+                  [
+                      recepient_email,
+                  ],
+                  html_message=html_content,
+                  fail_silently=False
+                  )

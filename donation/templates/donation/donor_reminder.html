@@ -1,0 +1,24 @@
+{% extends "donation/base.html" %} {% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col text-center">Hello: {{request.donor.username}}</div>
+  </div>
+  <div class="row">
+    <div class="col text-danger">
+      <pre>
+        Donation Request that You have Accepted Is Due Tomorrow...
+        Details of the Request Are:
+            Blood Group: {{request.blood_group}}
+            Location: {{request.location}}
+            Priority: {{request.priority}}
+            Requestor Name: {{request.created_by.username}}
+            Requestor Phone Number: {{request.created_by.phone_number}}
+        Please get in touch as soon as possible
+        🩸🩸🩸Donate Blood... Save Lifes....🩸🩸🩸
+        </pre
+      >
+    </div>
+  </div>
+</div>
+{% endblock %}

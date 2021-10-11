@@ -29,7 +29,7 @@ def donation_request_observer(sender, instance, created, **kwargs):
             'request': json.dumps(data)
         }
         )
-    else:
+    elif instance.status == Status.APPROVED:
         async_to_sync(layer.group_send)('user_donations', {
             'type': 'donation_request',
             'request': json.dumps(data)
@@ -69,9 +69,10 @@ def format_requestor_data_for_message(instance):
     """
     donor_name = instance.donor.username
     phone_number = instance.donor.phone_number
-    body = f"Donor {donor_name} having Phone Number{phone_number} has"
-    " accepted your request and will be"
-    " in contact with you soon"
+    body = (
+        f"Donor {donor_name} having Phone Number{phone_number} has"
+        " accepted your request and will be"
+        " in contact with you soon")
     return body
 
 
@@ -81,6 +82,8 @@ def format_donor_data_for_message(instance):
     """
     requestor_name = instance.created_by.username
     phone_number = instance.created_by.phone_number
-    body = f"Requestor {requestor_name} having Phone Number{phone_number} "
-    "awaits a call from you"
+    date_required = instance.date_required
+    body = (
+        f"Requestor {requestor_name} having Phone Number{phone_number} "
+        f"awaits a call from. Donation Request is Due on {date_required}")
     return body
