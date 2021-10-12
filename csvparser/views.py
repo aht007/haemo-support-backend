@@ -6,7 +6,7 @@ Views for CSV Parsing functionality
 # from rest_framework.response import Response
 # from rest_framework import status
 
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
 from .services import CsvParser
@@ -40,6 +40,7 @@ from asgiref.sync import async_to_sync
 #                 {"error": "You need to upload a CSV file"},
 #                 status=status.HTTP_400_BAD_REQUEST
 #             )
+
 
 @csrf_exempt
 @require_POST
