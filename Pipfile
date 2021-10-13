@@ -18,6 +18,8 @@ awsebcli = "*"
 celery = "*"
 redis = "*"
 flower = "*"
+daphne = "*"
+pyjwt = "==2.1.0"
 
 [dev-packages]
 pytest = "*"

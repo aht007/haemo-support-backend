@@ -7,12 +7,8 @@ Views for CSV Parsing functionality
 # from rest_framework import status
 
 from django.http import JsonResponse
-from django.views.decorators.http import require_POST
 
 from .services import CsvParser
-from django.views.decorators.csrf import csrf_exempt
-
-from asgiref.sync import async_to_sync
 
 # @permission_classes([permissions.IsAdminUser])
 # class CsvParserView(generics.GenericAPIView):
@@ -42,10 +38,10 @@ from asgiref.sync import async_to_sync
 #             )
 
 
-@csrf_exempt
-@require_POST
-@async_to_sync
 async def CsvParserView(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Method Not Allowed"},
+                            status=400)
     if 'file' not in request.FILES:
         return JsonResponse({"error": "You need to upload a CSV file"},
                             status=400)
