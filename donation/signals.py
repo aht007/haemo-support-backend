@@ -38,6 +38,31 @@ def donation_request_observer(sender, instance, created, **kwargs):
 
 
 @receiver(signals.post_save, sender=DonationRequest)
+def donation_request_status_notifier(sender, instance, created, **kwargs):
+    """
+    Pushes Notification to user on donation acceptance or rejection
+    """
+    layer = channels.layers.get_channel_layer()
+
+    if instance.status == Status.REJECTED:
+        async_to_sync(layer.group_send)(
+            f"notification-{instance.created_by.username}", {
+                'type': 'notification',
+                'request': json.dumps({"blood_group": instance.blood_group,
+                                       "status": instance.status})
+            }
+        )
+    elif instance.status == Status.APPROVED:
+        async_to_sync(layer.group_send)(
+            f"notification-{instance.created_by.username}", {
+                'type': 'notification',
+                'request': json.dumps({"blood_group": instance.blood_group,
+                                       "status": instance.status})
+            }
+        )
+
+
+@receiver(signals.post_save, sender=DonationRequest)
 def donation_request_approve_observer(sender, instance, created, **kwargs):
     """
     This method will send an email and sms to both donor and requestor
