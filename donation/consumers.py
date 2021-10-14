@@ -55,3 +55,44 @@ class DonationRequestsConsumer(WebsocketConsumer):
         request = event['request']
         # Send message to WebSocket
         self.send(request)
+
+
+class NotificationConsumer(WebsocketConsumer):
+    """
+    Notification Consumer for communication
+    through web sockets
+    """
+
+    def connect(self):
+        """
+        Connect method for web socket
+        """
+
+        user = self.scope['user']
+        if user.is_anonymous:
+            self.close()
+        else:
+            self.room_group_name = f"notification-{user.username}"
+            # Join room group
+            async_to_sync(self.channel_layer.group_add)(
+                self.room_group_name,
+                self.channel_name
+            )
+
+            self.accept()
+
+    def disconnect(self, close_code):
+        """
+        Dicconnect method for web socket
+        """
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    def notification(self, event):
+        """
+        notification structure for sending notification over web socket
+        """
+        request = event['request']
+        self.send(request)
